@@ -1,7 +1,669 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 1 here
-	</body>
-</html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>CS 184 Project 1: Rasterizer</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="88363428-8133-45bd-ae60-07603903eb9d" class="page sans"><header><h1 class="page-title">CS 184 Project 1: Rasterizer</h1></header><div class="page-body"><p id="1101d76e-38a4-4d62-b30d-25f0ef4679d8" class="">Shamus Li | Spring 2023</p><p id="327a2c98-a4dc-43dd-b817-67c3c5a28cd9" class="">For this project, I implemented a simple rasterizer that is able to draw triangles from svg descriptions. It includes features to reduce jagged edges with supersampling and apply texture maps with mipmap antialiasing. I learned a lot of lessons on how C++ works, how the rendering pipeline works, and how to write good bounds checks so that I don’t keep segfaulting 😢 </p><h1 id="47f19ba5-e2d4-469b-8d68-7083adf11540" class="">Section 1: Rasterization</h1><h2 id="b7f06a92-a796-473b-862e-c3642da09e96" class="">Part 1: Rasterizing single-colour triangles</h2><p id="c9186456-605c-4628-8fe9-4a5e7c05ce14" class="">To rasterize a triangle, I first establish the bounding box by getting the minimum and maximum vertices. Afterwards, I loop through the bounding box, testing each pixel location at its centre to see if it is inside the triangle (can’t be worse than an algorithm that checks each sample within the bounding box if that’s what I do). If the three line tests are ≥0 or ≤0, then it is considered to be inside the triangle. I did not implement the OpenGL edge rules unfortunately. If the pixel centre is within the triangle, I fill the pixel with the triangle’s colour.</p><figure id="0275cebf-8fe3-4632-ac37-b6d8c5db047a" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-19-4.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-19-4.png"/></a><figcaption>There were definitely some issues with this, where an entire chunk of the magenta triangle were not filled in, creating a nasty gap.</figcaption></figure><h2 id="8940f8f6-2d3f-4a94-816e-a2c5a3690938" class="">Part 2: Antialiasing triangles</h2><p id="a6b574d9-6107-409b-af27-15232c8c5fa8" class="">To fix the jagged edges and weird points, I implemented supersampling to the rasterization pipeline. Instead of checking only the centre point of each pixel, I now checked <code>sample_rate</code> points within the pixel instead. By averaging these checks over one pixel, the result is a better representation of the colour value that the pixel should have.</p><div id="70ab5cbb-fbc8-4c76-8d6b-8212cf860b7b" class="column-list"><div id="9d5af274-565a-476b-8977-147659b83115" style="width:33.333333333333336%" class="column"><figure id="348518dc-4252-4e08-96aa-5de4f23219a1" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-34.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-34.png"/></a><figcaption><code>sample_rate</code>: 1 per pixel</figcaption></figure></div><div id="90b0e097-84db-429d-8fd5-319473f1f605" style="width:33.333333333333336%" class="column"><figure id="c9031337-4827-4152-a5d6-f231fd6ed7be" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-36.png"><img style="width:432px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-36.png"/></a><figcaption><code>sample_rate</code>: 4 per pixel</figcaption></figure></div><div id="dd87b2fd-04d9-4978-abcb-be58e92e6ede" style="width:33.33333333333333%" class="column"><figure id="0002e69d-a2d3-48bf-9f7c-77b9bcd3d6a1" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-38.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_14-26-38.png"/></a><figcaption><code>sample_rate</code>: 16 per pixel</figcaption></figure></div></div><p id="135a9f39-8095-4eb8-a5c0-4f436dfa15cf" class="">Notice that the magenta triangle is much smoother in the supersampled images. This is because although the centre pixel did not lay in the triangle, some of the outer pixels did, contributing to a better representation when averaged.</p><h2 id="e28bfca2-1354-4f2a-978d-cac9e17ac006" class="">Part 3: Transforms</h2><p id="5da2e25b-7702-45f7-83fa-b266c8c39c6a" class="">For this part, I created a running robot (kind of). I changed the colour of cubeman to green so that when combined with the original cubeman, resembled the the little people you see at a crosswalk.</p><figure id="c83ec832-6b58-4d87-beb2-91afc46a9f9b" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-11-10.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-11-10.png"/></a></figure><h1 id="86ac7812-4c8d-4802-82b8-edf4f5e352c0" class="">Section 2: Sampling</h1><h2 id="650ac30b-0957-4c1d-9bc0-9a4484c03d81" class="">Part 4: Barycentric coordinates</h2><p id="a94f59f7-75ea-4ced-9bb0-31126abc6da9" class="">Instead of filling the triangles with only one colour, I now filled with them dynamically changing colours. To figure out which colour to fill at any given point in the triangle, we define three colours at each vertex of the triangle, and then each point in the triangle becomes a linear interpolation of the three points. By figuring out the relative distance of each vertex from the point, we can use this to mix the three vertex colours, as shown in the figure below</p><figure id="e03e8b2e-489d-4871-b457-ea2099dee3bb" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-30-15.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-30-15.png"/></a><figcaption>Here, the three vertex colours are red, green, and blue.</figcaption></figure><p id="085da305-241e-4de1-8a39-3527ee7d3825" class="">Below, I rendered the colour wheel at the default viewing parameters at a supersample rate of 1 per pixel.</p><figure id="fca0a745-a170-44f2-8b7b-5c366327366c" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-33-12.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-33-12.png"/></a></figure><h2 id="42935668-d48d-40d4-9b0a-7b04fb26068b" class="">Part 5: “Pixel sampling” for texture mapping</h2><p id="c7d4a9d5-9000-450c-9251-e5f1bf447880" class="">Here, instead of mapping each pixel to a raw colour based on interpolation from the vertices, I reference a texture mapping instead. The barycentric interpolation now becomes a (u, v) coordinate to the texture, which I can use to look up the pixel colour of the texture that should be at any given (x, y) coordinate. </p><p id="49d1ecda-af0e-4b62-9836-5fec49801c14" class="">Often, however, the (u, v) coordinate will not fall perfectly on the texture samples, and there are two solutions for this. One is nearest pixel sampling, which uses the pixel sample of the next point. The other is bilinear pixel sampling, which linearly interpolates between the nearest four points. Below, I show some results of both methods.</p><div id="32a041ef-d52e-40f9-9577-0daad4fdc421" class="column-list"><div id="0609a8fb-5f9a-4e6d-a5a7-7f2d90a56855" style="width:50%" class="column"><figure id="e75e1c2b-7b32-4817-834a-dec122264822" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-48-58.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-48-58.png"/></a><figcaption>nearest pixel sampling at 1 sample per pixel</figcaption></figure><figure id="87dc1502-bf8e-4941-bc1b-58dc9f56f344" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-4.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-4.png"/></a><figcaption>nearest at 16 samples per pixel</figcaption></figure></div><div id="f52c00cb-4a50-4c66-bbd1-41bc4042b950" style="width:50%" class="column"><figure id="c846cfe3-04b3-4457-aeee-8231b7822e46" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-10.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-10.png"/></a><figcaption>bilinear pixel sampling at 1 sample per pixel</figcaption></figure><figure id="40ecb39a-7fe5-4965-b1d9-e28ccebfa9af" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-16.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_16-49-16.png"/></a><figcaption>bilinear at 16 samples per pixel</figcaption></figure></div></div><p id="6a64a4e8-9eac-4898-9255-66a022673fe8" class="">It is evident that bilinear sampling is significantly better than nearest pixel sampling. This is especially apparent in when there are sharp edges, like in the next on the Berkeley seal.</p><h2 id="0f07e7d5-7d42-427b-b816-54611ea17223" class="">Part 6: “Level sampling” with mipmaps for texture mapping</h2><p id="b4a065ce-f4ce-4f39-9d10-4b7db574c161" class="">An easy way to improve performance is to use mipmaps, which store lower-resolution versions of a texture so that when a texture is small anyway, it is not necessary to render using the full-resolution texture.</p><p id="ef784b3e-8178-417a-a51f-4b5e14aa2b25" class="">To implement this, I used the same (u, v) coordinates from Part 5 (and 4), combined with additional (u, v) coordinates from nearby pixels to calculate the correct mipmap level to use. As with the coordinates, the mipmap level calculation is often not be an integer. The three solutions to this are to either always use the 0th level (highest resolution), use the nearest integer level, or use a linear interpolation between the two nearest levels. </p><p id="6dc798ef-e217-4ce7-9995-bf45f260a80a" class="">I chose an image from the internet, and then warped it in the same way as the Berkeley seal.</p><figure id="2605d588-ee9d-4b83-a0ce-850b0bdc69e1" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/calmly.png"><img style="width:288px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/calmly.png"/></a><figcaption>the original image</figcaption></figure><div id="92b14a40-9ae4-48ca-b03d-d9c29d79ed59" class="column-list"><div id="a45023d9-9815-412d-bd12-e1379e983099" style="width:50%" class="column"><figure id="fcfc426a-3d74-400c-9ceb-c2ba39ac75c6" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-35.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-35.png"/></a><figcaption>0th level sampling, nearest pixel sampling</figcaption></figure></div><div id="87f554e3-b3ec-482a-8698-320d69b77860" style="width:50%" class="column"><figure id="0d913730-2554-4936-bf7a-178d9bbf6b80" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-37.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-37.png"/></a><figcaption>0th level sampling, bilinear pixel sampling</figcaption></figure></div></div><div id="0589d946-f700-44b3-b430-d9de78386910" class="column-list"><div id="a105b12f-80f8-4b6f-bbce-fc6e97b45538" style="width:50%" class="column"><figure id="b2a84735-1c29-4362-bcaf-aec56eabeaee" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-41.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-41.png"/></a><figcaption>nearest level sampling, nearest pixel sampling</figcaption></figure></div><div id="7bd0f699-140b-472d-a1b9-58881730f76f" style="width:50%" class="column"><figure id="52b13f28-dd74-48e1-9785-55b0faa6c407" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-49.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-49.png"/></a><figcaption>nearest level sampling, bilinear pixel sampling</figcaption></figure></div></div><div id="781e24ec-390e-4756-b0af-7b413ae71e6d" class="column-list"><div id="b045c34d-150d-4df9-a605-9ba95144dd8a" style="width:50%" class="column"><figure id="04e8cb39-2f43-48c4-9de4-8a78cb989a0f" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-52.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-52.png"/></a><figcaption>linear level sampling, nearest pixel sampling</figcaption></figure></div><div id="ad87ad01-d32e-454e-9cdf-c8e0e0867d0d" style="width:50%" class="column"><figure id="bde356ac-67aa-4ca1-8d98-4facc3957f58" class="image"><a href="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-53.png"><img style="width:1600px" src="CS%20184%20Project%201%20Rasterizer%2088363428813345bdae6007603903eb9d/screenshot_2-14_17-39-53.png"/></a><figcaption>trilinear sampling</figcaption></figure></div></div><p id="05842f1e-02f8-4401-a1b7-cc97c78c5d02" class="">As evident in the images, when zoomed this far away, the nearest  and linear level sampling noticed that it was not necessary to use the full 0th level texture, so the quality was degraded, leading to higher performance. However, in linear level sampling, the quality was not degraded as much as the nearest level sampling, however at a slight performance penalty. Therefore, although using mipmaps lead to more memory usage, there is a significant performance gain.</p></div></article></body></html>
