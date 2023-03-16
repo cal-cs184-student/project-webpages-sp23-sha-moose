@@ -1,7 +1,826 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-1 here
-	</body>
-</html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>CS 184 Part 3-1: Pathtracer</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="fa5bb330-6c6c-48a9-952b-958d761f333f" class="page sans"><header><h1 class="page-title">CS 184 Part 3-1: Pathtracer</h1></header><div class="page-body"><p id="6a3b9f37-4456-4746-8d58-ebdfd1c2707d" class="">Shamus Li | Spring 2023</p><p id="277bf71b-7a6b-4bdb-9ee2-bb788b8ea172" class="">Website URL: <a href="https://sha-moose.github.io/cs184-proj-webpages/proj3-1/index.html">https://sha-moose.github.io/cs184-proj-webpages/proj3-1/index.html</a></p><p id="9feba215-5072-4aa2-bf8d-f460bede9ac4" class="">In this project, I implemented a path-tracing renderer for 3D scenes. I use a Monte Carlo method that simulated the behaviour of light in a scene, working by tracing rays from the camera into the scene, and then bouncing them off surfaces until they hit a light source. Along the way, each ray accumulates colour and light information based on the materials it hits and the lights it bounces off of. </p><p id="a7a29455-ea24-4fa4-bd58-c6c5c11e11ec" class="">In part 1, I implement the ray generation and primitive intersection parts of the rendering pipeline. I then sped up rendering in part 2 by implementing an algorithm that constructs a bounding volume hierarchy (BVH) that organizes the objects in a scene to speed up rendering. This dramatically reduced the rendering time of even large scenes.</p><p id="b4178cad-95d1-4136-b998-b79c046feaea" class="">To create realistic lighting effects, I implement two methods for estimating the direct lighting function: uniform hemisphere sampling and importance sampling the lights. In addition, I include global illumination, which accounts for indirect lighting effects. With these two methods, I was able to render realistic looking images of models that use diffuser BSDFs. Finally, to reduce noise while increasing samples per pixel, I implemented adaptive sampling logic, which stops sampling early if the pixel has already converged.</p><p id="02bfe84c-c696-492a-a321-31a8e403e58a" class="">Overall, although this was an extremely long project, it was super interesting and gave me perspective on how realistic rendering effects are achieved. The techniques used in the project to speed up rendering made me think about other ways with which rendering could be accelerated. </p><h1 id="0c7bf17f-fc80-41da-8751-b662ed0bcd39" class=""><strong>Part 1: Ray Generation and Scene Intersection</strong></h1><p id="d2050470-4f2e-4fba-b377-cbee2edf49f1" class="">In the context of a path-tracing renderer for 3D scenes, the ray generation and primitive intersection stages are crucial components of the rendering pipeline. The ray generation stage involves casting a ray from the camera into the scene, with the direction of the ray determined by the pixel that is being rendered. This stage is responsible for determining the starting point of the ray, as well as its direction and magnitude.</p><p id="0c5caaa5-04a5-4730-8594-f3a729134533" class="">To simulate light interactions within the scene, I am working with a light ray model. As a ray, light can be modelled by the following equation:</p><figure id="b499c836-639a-4f60-bf23-37ee3e347a80" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mover accent="true"><mi>r</mi><mo>⃗</mo></mover><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mover accent="true"><mi>o</mi><mo>⃗</mo></mover><mo>+</mo><mi>t</mi><mover accent="true"><mi>d</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{r}(t) = \vec{o} + t\vec{d}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.17994em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.79733em;vertical-align:-0.08333em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.17994em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9774399999999999em;vertical-align:0em;"></span><span class="mord mathnormal">t</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774399999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">d</span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.06882999999999997em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="4419e76c-11f9-4156-bcd3-3cb0d8a08491" class="">where the position of the ray at a point in time is defined by the origin of the ray and its direction. This introduces a complication: how do you translate a 2D pixel location to a 3D point and direction in the world space? To do this, I translate the image to a virtual camera sensor in the <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>Z</mi></mrow><annotation encoding="application/x-tex">-Z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span></span></span></span></span><span>﻿</span></span> axis, where I sample a position within the pixel for the origin, and the vector from the camera origin to this point forms the direction vector.</p><p id="a18bec0a-1efb-4a6f-a089-ec8b87f65c73" class="">Once the ray has been generated, it is then passed to the primitive intersection stage. Primitives, such as triangles, boxes, or spheres, are defined mathematically, and by equating their functions with the ray equation, I am able to determine the time, if at all, that they intersect with the ray. This information is then used to calculate the colour and light information for the pixel that the ray corresponds to.</p><p id="f12f8cb0-5ff3-4cd9-8175-d3a9ef1f99c4" class="">Overall, the ray generation and primitive intersection stages are essential for simulating light interactions within the scene, and are critical for generating realistic looking images of 3D models.</p><p id="4f6a12f8-dd12-42e7-aafa-6119d98b7fd5" class="">To test for triangle intersection, I can use the Möller-Trumbore algorithm.</p><figure id="ad37dced-d143-48f4-8b17-e1542e2865bc" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mo fence="true">[</mo><mtable rowspacing="0.1600em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>t</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>b</mi><mn>1</mn></msub></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>b</mi><mn>2</mn></msub></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mover accent="true"><msub><mi>E</mi><mn>1</mn></msub><mo>⃗</mo></mover><mo>⋅</mo><mover accent="true"><msub><mi>S</mi><mn>1</mn></msub><mo>⃗</mo></mover></mrow></mfrac><mrow><mo fence="true">[</mo><mtable rowspacing="0.1600em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mover accent="true"><msub><mi>S</mi><mn>2</mn></msub><mo>⃗</mo></mover><mo>⋅</mo><mover accent="true"><msub><mi>E</mi><mn>2</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mover accent="true"><msub><mi>S</mi><mn>1</mn></msub><mo>⃗</mo></mover><mo>⋅</mo><mover accent="true"><mi>S</mi><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mover accent="true"><msub><mi>S</mi><mn>2</mn></msub><mo>⃗</mo></mover><mo>⋅</mo><mover accent="true"><mi>D</mi><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{bmatrix} t \\ b_1 \\ b_2\end{bmatrix} = \frac{1}{\vec{E_1} \cdot \vec{S_1}} \begin{bmatrix} \vec{S_2} \cdot \vec{E_2} \\ \vec{S_1} \cdot \vec{S} \\ \vec{S_2} \cdot \vec{D}\end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.60004em;vertical-align:-1.55002em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05002em;"><span style="top:-2.2500000000000004em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎣</span></span></span><span style="top:-3.3970000000000002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span style="height:0.016em;width:0.667em;"><svg width='0.667em' height='0.016em' style='width:0.667em' viewBox='0 0 667 16' preserveAspectRatio='xMinYMin'><path d='M319 0 H403 V16 H319z M319 0 H403 V16 H319z'/></svg></span></span><span style="top:-4.05002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎡</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55002em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">t</span></span></span><span style="top:-3.0099999999999993em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-1.8099999999999994em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5500000000000007em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05002em;"><span style="top:-2.2500000000000004em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎦</span></span></span><span style="top:-3.3970000000000002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span style="height:0.016em;width:0.667em;"><svg width='0.667em' height='0.016em' style='width:0.667em' viewBox='0 0 667 16' preserveAspectRatio='xMinYMin'><path d='M263 0 H347 V16 H263z M263 0 H347 V16 H263z'/></svg></span></span><span style="top:-4.05002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎤</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55002em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:3.9789899999999996em;vertical-align:-1.7394949999999998em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.14367em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.00633em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05002em;"><span style="top:-2.2500000000000004em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎣</span></span></span><span style="top:-3.3970000000000002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span style="height:0.016em;width:0.667em;"><svg width='0.667em' height='0.016em' style='width:0.667em' viewBox='0 0 667 16' preserveAspectRatio='xMinYMin'><path d='M319 0 H403 V16 H319z M319 0 H403 V16 H319z'/></svg></span></span><span style="top:-4.05002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎡</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55002em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.239495em;"><span style="top:-4.273165em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-2.9468349999999996em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span><span style="top:-1.6205050000000003em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.17994em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7394949999999998em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05002em;"><span style="top:-2.2500000000000004em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎦</span></span></span><span style="top:-3.3970000000000002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span style="height:0.016em;width:0.667em;"><svg width='0.667em' height='0.016em' style='width:0.667em' viewBox='0 0 667 16' preserveAspectRatio='xMinYMin'><path d='M263 0 H347 V16 H263z M263 0 H347 V16 H263z'/></svg></span></span><span style="top:-4.05002em;"><span class="pstrut" style="height:3.1550000000000002em;"></span><span class="delimsizinginner delim-size4"><span>⎤</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55002em;"><span></span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="2e33cbd4-d447-4acf-af11-51389dd3f7d5" class="">where</p><figure id="665e24b4-b7e9-4f88-9784-8ddb493ee470" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.2500em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mover accent="true"><msub><mi>E</mi><mn>1</mn></msub><mo>⃗</mo></mover></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mover accent="true"><msub><mi>P</mi><mn>1</mn></msub><mo>⃗</mo></mover><mo>−</mo><mover accent="true"><msub><mi>P</mi><mn>0</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mover accent="true"><msub><mi>E</mi><mn>2</mn></msub><mo>⃗</mo></mover></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mover accent="true"><msub><mi>P</mi><mn>2</mn></msub><mo>⃗</mo></mover><mo>−</mo><mover accent="true"><msub><mi>P</mi><mn>0</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mover accent="true"><mi>S</mi><mo>⃗</mo></mover></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mover accent="true"><mi>o</mi><mo>⃗</mo></mover><mo>−</mo><mover accent="true"><msub><mi>P</mi><mn>0</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mover accent="true"><msub><mi>E</mi><mn>1</mn></msub><mo>⃗</mo></mover></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mover accent="true"><mi>D</mi><mo>⃗</mo></mover><mo>−</mo><mover accent="true"><msub><mi>E</mi><mn>2</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mover accent="true"><msub><mi>S</mi><mn>2</mn></msub><mo>⃗</mo></mover></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mover accent="true"><mi>S</mi><mo>⃗</mo></mover><mo>−</mo><mover accent="true"><msub><mi>E</mi><mn>1</mn></msub><mo>⃗</mo></mover></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned} \vec{E_1} &amp;= \vec{P_1} - \vec{P_0} \\ \vec{E_2} &amp;= \vec{P_2} - \vec{P_0} \\ \vec{S} &amp;= \vec{o} - \vec{P_0} \\ \vec{E_1} &amp;= \vec{D} - \vec{E_2} \\ \vec{S_2} &amp;= \vec{S} - \vec{E_1} \end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:8.13165em;vertical-align:-3.8158249999999994em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.315825em;"><span style="top:-6.349495em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-4.723165000000001em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.0968350000000013em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span><span style="top:-1.470505000000001em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:0.15582499999999921em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.8158249999999994em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.315825em;"><span style="top:-6.349495em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-4.723165000000001em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.0968350000000013em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.17994em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-1.470505000000001em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.17994em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:0.15582499999999921em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.8158249999999994em;"><span></span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="e75dcbaf-5a27-43eb-a11d-8feaba134667" class="">From this calculation, <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathnormal">t</span></span></span></span></span><span>﻿</span></span> is the time of intersection and (<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mn>1</mn><mo separator="true">,</mo><mi>b</mi><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo>−</mo><mi>b</mi><mn>1</mn><mo>−</mo><mi>b</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">b1, b2, 1-b1-b2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">b</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal">b</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal">b</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">b</span><span class="mord">2</span></span></span></span></span><span>﻿</span></span>) are barycentric coordinates that describe the intersected point. This algorithm requires fewer arithmetic operations than directly equating the triangle equation with the ray equation. If the <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathnormal">t</span></span></span></span></span><span>﻿</span></span> is in between the ray’s <code>min_t</code> and <code>max_t</code> properties, I know that the ray intersects the triangle. For a sphere intersection, we do actually directly solve the resulting quadratic equation, so it is less exciting.</p><p id="9fc8330b-3b21-4b3b-b186-65d9e73877b3" class="">Since I am able to now detect intersections between rays and primitives, I can render triangular and spherical meshes (using just normal shading, for now).</p><div id="2b6c1b96-c9c4-4d34-bd77-df203d3b5c8a" class="column-list"><div id="1fd6be30-12b7-4cd7-abdc-fcbc8a7ee438" style="width:50%" class="column"><figure id="45f315c9-ca39-4735-9f4b-f5b9a24b86e0" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/teapot.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/teapot.png"/></a></figure><figure id="468a2fcf-79fd-43c3-9a5d-55e245feaa3f" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bench.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bench.png"/></a></figure></div><div id="b9f5c834-e627-4bde-bb44-fbffa070fc6e" style="width:50%" class="column"><figure id="9837268c-d5ec-49eb-891d-c71ab65645e2" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/banana.png"><img style="width:432px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/banana.png"/></a></figure><figure id="374e6610-4d58-4a60-927f-f974ee6c4fb2" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny.png"/></a></figure></div></div><h1 id="32e0b0ab-70ce-478f-899e-729ce898ccb5" class=""><strong>Part 2: Bounding Volume Hierarchy</strong></h1><p id="46c86b3b-c7fc-431a-889f-12c77b55eaee" class="">Using the solution from part 1 requires each ray to check each primitive, which is acceptable for smaller volumes but becomes much too slow as soon as the number of primitives goes above 10k+. To avoid having to check every object, I constructed a bounding volume hierarchy (BVH) for each mesh.</p><p id="c6fcb1b6-f394-4be9-b17f-025e60ca83f1" class="">The BVH construction algorithm involves recursively partitioning the scene into bounding volumes until each leaf node contains only <code>max_leaf_size</code> primitives. The BVH construction algorithm employs a heuristic known as the splitting point, which is used to determine the best location to split the current BVH node. In my implementation, the splitting point is calculated based on the average of all centroids of the primitives in the current BVH node, and splitting based on the longest axis. (I’m not entirely sure that splitting average centroids is the best approach, I hope to implement a better heuristic in the future). By doing this, the BVH construction algorithm ensures that the partition is relatively balanced, and that each child node has an equal number of primitives, leading to good performance. I also include explicit logic that ensures both partitions must have at least one object to avoid bugs. </p><p id="4087fd29-9142-472b-9602-5e7ed270e4f3" class="">To recursively test for intersections in a BVH hierarchy, I first check if the ray intersects the bounding box of the root node of the BVH. If not, I can discard the entire subtree rooted at that node. If the ray does intersect the bounding box, I check if the node is a leaf. If it is, I test the ray against each primitive in the leaf node. If it is not a leaf node, I recursively test the ray against the left and right child nodes, and continue until I reach a leaf node. This process significantly reduces the number of primitives checked for intersection because I can discard entire BVH nodes at a time.</p><p id="f18d5d0a-edc7-4d05-bd39-d2dff8ec86ae" class="">One optimization I made was to not store arrays of primitives in each node of the BVH, rather storing <code>start</code> and <code>stop</code> pointers (which are actually <code>std::vector::iterator</code>s) to one contiguous list of <code>primitives</code>. This reduces the amount of memory that the BVH takes up, which increases performance.</p><p id="66099e17-da3a-4468-a4ae-1d03f9ae5a80" class="">By organizing the objects in a scene within a BVH structure, rendering time can be dramatically reduced, especially for larger scenes with many primitives. Below, I show some large volumes, which took only fractions of a second to render (with normal shading again, for now).</p><div id="8333c785-83b8-4da4-9098-3ff23e60c31b" class="column-list"><div id="46a9b789-e6a2-4f5c-9375-5716ab62837a" style="width:50%" class="column"><figure id="4c1dbc63-9a3a-4213-be00-7f0c3838fbd1" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e.png"><img style="width:432px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e.png"/></a><figcaption>wall-e (240326 primitives), 0.0407 seconds</figcaption></figure><figure id="753a5eb8-0e04-4353-b8f1-c0abd6fc55fd" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/maxplanck.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/maxplanck.png"/></a><figcaption>maxplanck (50801 primitives), 0.0503 seconds</figcaption></figure></div><div id="0e1037fa-a735-439d-979c-98cdc668fa69" style="width:50%" class="column"><figure id="f3f18c31-4dce-4352-899c-06ce42db9202" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBlucy.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBlucy.png"/></a><figcaption>CBlucy (133796 primitives), 0.0308 seconds</figcaption></figure><figure id="59ae36e2-302f-44d3-a764-50d4251f89c7" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/dragon.png"><img style="width:800px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/dragon.png"/></a><figcaption>dragon (105120 primitives), 0.0410 seconds</figcaption></figure></div></div><p id="d031a5c1-f7f1-41f3-a757-936bf881ff5d" class="">Here is a more quantitative analysis. Running <code>-t 8 -r 800 600 -f cow.png ../dae/meshedit/cow.dae</code> (render an 800x600 <code>cow.dae</code> with 8 threads) took 5 seconds with no BVH and 0.0251 seconds with BVH! Comparatively, running <code>-t 16 -r 800 600 -f CBlucy.png ../dae/sky/CBlucy.dae</code> (render an 800x600 <code>CBlucy.dae</code> with 16 threads) took 190 seconds with no BVH and 0.0308 seconds with BVH. This amounts to a 99% increase in performance, showing that the use of BVH is very effective for complex models, especially with a good heuristic.</p><ul id="d17700ab-66e0-4b9a-ae7d-fcb56e1eb326" class="bulleted-list"><li style="list-style-type:disc"> Comparing the two methods, importance sampling the lights was able to more accurately capture the lighting of the scene, particularly with point sources of light. Hemisphere sampling struggled to intersect lights that were not oriented directly towards the hemisphere.</li></ul><h1 id="b5843fbc-ed38-4d88-8028-6524af9f0a1e" class=""><strong>Part 3: Direct Illumination</strong></h1><p id="85bcfc5a-5851-413e-9dcc-fbf7c78f2b3f" class="">Instead of using plain normal shading, I now use my newfound ray-tracing powers to estimate the direct lighting at each pixel. The direct lighting function can be estimated using two methods: uniform hemisphere sampling and importance sampling the lights. Uniform hemisphere sampling evenly samples the hemisphere and calculates the direct lighting function based on the average of the sample values. Importance sampling the lights divides the light sources based on their intensity and samples based on the probability densities.</p><p id="b8b51b3b-2ace-4939-84ca-cce81e78c9d2" class="">To implement direct lighting with uniform hemisphere sampling, I can use a Monte Carlo estimator. I first sample a random direction on the hemisphere above the hit point. I then trace a ray towards the sampled direction and calculate the contribution of the light source by computing the cosine of the angle between the light direction and the normal at the intersection point. I multiply this cosine term with the BSDF value (which, for a diffuser BSDF, is <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mi>e</mi><mi>f</mi><mi>l</mi><mi>e</mi><mi>c</mi><mi>t</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>e</mi><mi mathvariant="normal">/</mi><mi>π</mi></mrow><annotation encoding="application/x-tex">reflectance / \pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">re</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">ec</span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span><span class="mord mathnormal">ce</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span></span></span></span></span><span>﻿</span></span>) and the light&#x27;s intensity, and divide by the probability density of the direction being sampled (which, for a uniform hemisphere, is <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>2</mn><mi>π</mi></mrow><annotation encoding="application/x-tex">1/2\pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span></span></span></span></span><span>﻿</span></span>). This gives me the direct lighting contribution from the light source for that particular sample. I repeat this process for multiple samples and take the average to get an estimate of the direct lighting function.</p><div id="a95b9b90-79e5-4fc2-9fde-f662164eaaaf" class="column-list"><div id="9a16a26b-94c2-45fb-98f3-0eaf3384f290" style="width:50%" class="column"><figure id="84479d1e-3ab4-46f1-8c44-6f44af8f7827" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-H.png"><img style="width:384px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-H.png"/></a><figcaption>Bunny with uniform hemisphere sampling</figcaption></figure></div><div id="3064b4e9-bcd1-46e0-98ea-4548154dfdd7" style="width:50%" class="column"><figure id="109ba318-bfa1-460c-9142-08799f8d9653" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-D.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-D.png"/></a><figcaption>Bunny with importance light sampling</figcaption></figure></div></div><p id="8c047de6-673e-465e-9dd4-3effc61cd774" class="">Instead of sampling in random directions, importance sampling looks directly at each light in the scene. To implement importance sampling the lights, I loop through each light source. I then sample a point on the chosen light source and calculate the direction from the hit point to the light source, as well as the distance to the light and the probability density of the light being sampled. I then trace a ray towards the light source and calculate the contribution of the light source (if there’s an object between the source and the light, it probably doesn’t contribute very much). I multiple the BSDF value and the light&#x27;s intensity, and divide by the probability density of the light source being sampled. This is the importance-sampled Monte Carlo estimator, which takes the form</p><figure id="7aca32a2-bdea-47b5-93e7-7debf75a9c1d" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mfrac><mrow><mi>f</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>p</mi><mi>d</mi><mi>f</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{1}{n}\sum_{i=1} ^n \frac{f(x_i)}{pdf(x_i)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.929066em;vertical-align:-1.277669em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6513970000000002em;"><span style="top:-1.872331em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.050005em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3000050000000005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.277669em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="mord mathnormal" style="margin-right:0.10764em;">df</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div></figure><p id="c468204b-14dd-4706-84fb-2f87273e4240" class="">This gives us the direct lighting contribution from the light source for that particular sample. I repeat this process for multiple samples and take the average to get an estimate of the direct lighting function (unless the light is a point source, in which case only one sample is sufficient).</p><p id="c40a90e6-f1cb-4b63-b689-7b5137ce5182" class="">For both methods, in order to avoid floating-point errors occurring with the ray intersecting the object it originated from, I add an <code>EPS_F</code> offset to the ray’s <code>min_t</code> property. For the light sampling, I also subtract <code>EPS_F</code> from the <code>max_t</code> to prevent the ray from intersecting the light itself (as that obviously doesn’t count as an obstruction).</p><div id="9096d6bb-e698-4484-8745-9b17c6ea1a44" class="column-list"><div id="c1c4be95-238c-41ba-8b5f-cc953080e272" style="width:50%" class="column"><figure id="56b2ea7c-7348-4cfc-bafe-c98320762f7c" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/blob-H.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/blob-H.png"/></a><figcaption>Blob with uniform hemisphere sampling. Here, because there are only point sources, hemisphere sampling was not able to intersect any of the lights.</figcaption></figure></div><div id="bafc99af-d344-49d3-9b3b-e0ebb293597e" style="width:50%" class="column"><figure id="4772af77-f20f-46fe-a28a-38d9ecb93654" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/blob-D.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/blob-D.png"/></a><figcaption>Blob with importance light sampling</figcaption></figure></div></div><p id="3997e30e-7271-436f-bd6d-f0852db43d35" class="">Overall, importance sampling the lights is able to more accurately capture the lighting of the scene, particularly with point sources of light. Hemisphere sampling struggled to intersect lights that were not oriented directly towards the hemisphere. In addition, hemisphere sampling generally had more noise when rendered with the same parameters—these comparison images were rendered with 64 samples per pixel and 32 light rays.</p><div id="18f51c6f-4f99-495a-a04d-34f12a411a5d" class="column-list"><div id="4c04f0d9-d142-4422-a52d-e58244dcf521" style="width:50%" class="column"><figure id="4a45c118-c88a-4d24-8beb-705843e1d38f" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/empty-H.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/empty-H.png"/></a><figcaption>Empty Cornell box with uniform hemisphere sampling</figcaption></figure></div><div id="e8e441a6-6be3-466d-a11a-ae32dfdce803" style="width:50%" class="column"><figure id="dc59845e-f4f3-4f7f-ac30-47f8ab6677b3" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/empty-D.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/empty-D.png"/></a><figcaption>Empty Cornell box with importance light sampling. Here, because there is just one well-defined light source with no obstacles, Importance sampling was able to clearly render the box.</figcaption></figure></div></div><p id="1df5a302-46d3-45d6-9a47-6395383d8bf8" class="">However, direct light importance sampling is not always free from noise. Below, I run importance sampling on <code>CBbunny.dae</code>, a Cornell box scene with one area light, using 1 sample per pixel and differing amounts of light rays. It is clear that noise is reduced as the number of light rays increases, a difference that is most apparent in the shadows below the bunny’s head. In the 1 and 4 ray renders, the shadow is coarse and harsh. However, by the 64 ray render, the shadow becomes soft and relatively noise-free—much more realistic!</p><div id="1324e4af-cad4-4971-91d0-86f67f66fbeb" class="column-list"><div id="72b4902a-85e0-4111-81e1-a2490180a3c6" style="width:50%" class="column"><figure id="f8521fc8-12cd-47b5-836f-4a9c3926364f" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l1.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l1.png"/></a><figcaption>1 light ray</figcaption></figure><figure id="63ebfedf-8240-4f5f-917b-65216974761b" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l16.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l16.png"/></a><figcaption>16 light rays</figcaption></figure></div><div id="f87a4a7d-d5e0-466f-920d-4f68c21b00b1" style="width:50%" class="column"><figure id="643f6c40-268a-4814-9c49-88ed15588599" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l4.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l4.png"/></a><figcaption>4 light rays</figcaption></figure><figure id="cc008908-d1bf-44a9-856b-40cd5e348c5a" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l64.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bunny-l64.png"/></a><figcaption>64 light rays</figcaption></figure></div></div><p id="139add24-7e69-45ee-bae7-194741cf5ed0" class="">When it comes to accurately capturing the lighting of a scene, importance sampling is generally the preferred method, particularly with point sources of light. Hemisphere sampling can have difficulty intersecting lights that are not directly oriented towards the hemisphere, which can result in more noise in the rendered images. Moreover, hemisphere sampling typically produces more noise when rendered with the same parameters as importance sampling. This is because most of the samples produced by hemisphere sampling do not go towards a light, wasting those rays. On the other hand, importance sampling will actually point a ray towards a light, ensuring that all samples will be taken from angles where the incoming radiance could actually be non-zero. It&#x27;s important to note, however, that direct light importance sampling isn&#x27;t always free from noise, and the quality of the rendered image is impacted by the number of light rays used and the number of samples per pixel.</p><h1 id="8c508056-78fa-42eb-a808-3bed12ab4005" class=""><strong>Part 4: Global Illumination</strong></h1><p id="56582358-33f9-4dac-9123-345b75742178" class="">Although direct illumination is more accurate than using normal shading, it is still not very realistic—very rare will you see completely black shadows on objects or a dark ceiling despite a huge area light in a white room. This is because my lighting model only accounts for light that directly enters the camera sensor or bounces once to reach the sensor, when in reality light usually bounces many times before reaching the camera. </p><figure id="0460cac1-b2ac-48b5-9c8d-01938930eda1" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres-1024.png"><img style="width:432px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres-1024.png"/></a><figcaption>looks pretty realistic!</figcaption></figure><p id="0bb8909a-2bc7-4bdf-822e-027eddf02d24" class="">Global illumination accounts for indirect lighting effects by simulating the path of light rays as they bounce around the scene. In order to implement global illumination, I first need to trace the path of each ray as it bounces around the scene. This requires me to modify my existing path tracer to allow multiple bounces, rather than just a single bounce.</p><p id="e5b30f83-21bb-4c2d-9e9b-caff8bb118c5" class="">I implemented a recursive method that accounts not only just for one bounce of light, but subsequent bounces by that ray as well. For a ray that hits an object, I sample a new direction, and beam a new ray in that direction. If that ray intersects another object, I get the radiance of that object and multiply it by the current BSDF and a cosine factor. To account for the Beer-Lambert law, which states that the intensity of light decreases exponentially as it travels through a medium, I also divide by the continuation probability if it is not the first bounce. </p><div id="c9e6133e-95cb-427b-9e83-eac8cb57b40d" class="column-list"><div id="4c8bf78b-ffb7-4d04-bfeb-72a882ab7883" style="width:50%" class="column"><figure id="36366d12-2973-46fb-aab9-1d808abbc65b" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/dragon-1024.png"><img style="width:384px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/dragon-1024.png"/></a></figure></div><div id="c0b39852-72fb-49c6-9ad7-23d8d84d4e18" style="width:50%" class="column"><figure id="b8a0ffd3-8bb3-42ec-94d7-34871d46940c" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bench-1024.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/bench-1024.png"/></a></figure></div></div><p id="849e0862-d45a-4d7d-9fd3-b892e3dcd883" class="">To avoid having to trace an infinite number of rays, I need to set a maximum depth for each ray. When a ray reaches <code>max_ray_depth</code>, I stop tracing it and assume that it has no further impact on the scene. This is called the maximum ray depth. In addition, I use a technique called Russian Roulette. Russian Roulette randomly terminates rays with a certain probability (30%), rather than continuing to trace them indefinitely. To implement Russian Roulette, I flip a biased coin with 30% chance. If it doesn’t hit the termination side, I continue tracing the ray. Otherwise, I terminate the ray and return the radiance accumulated so far. I do implement a condition that if <code>max_ray_depth</code> is greater than 1, then there will be at least 1 additional bounce, regardless of Russian Roulette. Therefore, my stopping conditions are:</p><ol type="1" id="dcb25af0-8bc4-4797-8d0f-11bf0c051e7d" class="numbered-list" start="1"><li><code>max_ray_depth</code> reached</li></ol><ol type="1" id="7b162f7f-53c0-4129-b703-739d83dcedfd" class="numbered-list" start="2"><li>we’ve passed the one mandatory additional bounce, and Russian Roulette kicks in</li></ol><ol type="1" id="e0261021-61b5-4b99-9500-514880044ad5" class="numbered-list" start="3"><li>the new ray doesn’t intersect any new object</li></ol><div id="929028f0-4c1b-46b9-ad9e-f4c20dfc8bb3" class="column-list"><div id="ed7b2891-8d4b-44af-b780-b2a27a2acdca" style="width:50%" class="column"><figure id="82ac09eb-3fab-4f51-a3b4-1ef106a4c4c9" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_direct.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_direct.png"/></a><figcaption>CBSpheres with only direct illumination. Notice the blackness on the ceiling and on the spheres.</figcaption></figure><p id="89b449e1-f459-4320-8ea8-12c4cdc03162" class="">
+</p></div><div id="219d96e7-b8e3-4af7-83fc-fae263063ec6" style="width:50%" class="column"><figure id="fb54175d-c03b-4d73-844e-06c96242f23c" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_indirect.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_indirect.png"/></a><figcaption>Spheres with only indirect illumination. Notice the black shadows are gone, but the direct effects of the top light are not there.</figcaption></figure></div></div><figure id="b4070e9d-22f4-4ff4-9e4c-6d5e51cced31" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_total.png"><img style="width:384px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/spheres_total.png"/></a><figcaption>The final result using global illumination. This models the lighting much more accurately.</figcaption></figure><p id="644150d5-3974-4d19-9f27-555e68106b8a" class="">As you can see, direct illumination alone causes black shadows on the ceiling and on the spheres. Indirect illumination alone removes the black shadows, but does not capture the direct effects of the top light. Combining both direct and indirect illumination results in a more realistic rendering of the scene.</p><p id="4dae0d60-255e-45cb-b43c-9d7d08254093" class="">To visualize the effects of <code>max_ray_depth</code>, I rendered CBbunny.dae using different maximum values at 1024 samples per pixel, 16 light rays. In general, the more times the rays are allowed to bounce, the more harsh shadows are reduced and colour from the walls are visible in the shadows of the bunny. Due to the additional radiance modelled, the scene is also generally brighter. However, due to Russian Roulette and the Beer Lambert law, the <code>m=3</code> and <code>m=100</code> images are fairly similar. This is because a ray is unlikely to bounce 100 times, and even if it did, the contribution from those bounces are likely to be negligible.</p><div id="fc34c036-6e76-4fe9-9637-bd178ee7c336" class="column-list"><div id="42905929-0e48-4dfd-a6be-ee99b6e7a086" style="width:50%" class="column"><figure id="1329b8a0-8613-4a04-97b4-bce4ed0a5fc5" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_0.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_0.png"/></a><figcaption><code>max_ray_depth</code>: 0. This is just zero-bounce radiance.</figcaption></figure></div><div id="fab68a6b-86b6-47d4-9404-b5e53f8fdfa3" style="width:50%" class="column"><figure id="89bcec5d-6dce-4460-a0ba-d7293faff5c3" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_1.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_1.png"/></a><figcaption><code>max_ray_depth</code>: 1. This is only direct illumination.</figcaption></figure></div></div><div id="6fc1adcc-8088-435e-a947-2804ff0db91f" class="column-list"><div id="0670ee8c-7890-4ce9-a4e9-a5639e5a2728" style="width:50%" class="column"><figure id="208dbb69-d8ce-40dc-99e8-a8bde5e540bd" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_2.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_2.png"/></a><figcaption><code>max_ray_depth</code>: 2. Now global illumination is “on.”</figcaption></figure></div><div id="e3bed479-f661-470b-8aea-57415a0fd989" style="width:50%" class="column"><figure id="cc9a2e61-8896-4a4b-aeeb-c17618d2ab6f" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_3.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_3.png"/></a><figcaption><code>max_ray_depth</code>: 3. The shadows underneath the bunny are softer, with more colour.</figcaption></figure></div></div><figure id="fcd77b1f-64e7-4a87-90c0-fdf6d29abda0" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_100.png"><img style="width:384px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBbunny_1024_100.png"/></a><figcaption><code>max_ray_depth</code>: 100. The shadows are even softer and more colourful, but only marginally so.</figcaption></figure><p id="5e767c6a-e4d8-4fac-8e4a-45f441881046" class="">To illustrate the effects of samples per pixel, I rendered <code>wall-e.dae</code> using variable sampling rates and 4 rays at <code>max_ray_depth</code> of 5. It is clear that increasing the number of samples per pixel, which it dramatically increases the runtime cost, results in a significant noise decrease. This is most apparent on the body of wall-e, especially the dark areas near the wheel.</p><div id="fd20c40e-b643-44a3-ad4c-f96e68cb7baf" class="column-list"><div id="f6c2a539-4a25-489d-b883-cb7d19f410b0" style="width:50%" class="column"><figure id="8e360f62-c5e2-4e50-988e-67c69fbeedd4" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-1.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-1.png"/></a><figcaption>1 sample per pixel</figcaption></figure><figure id="69830694-7713-4a1f-bbad-36aa5c64ac8b" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-4.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-4.png"/></a><figcaption>4 samples per pixel</figcaption></figure><figure id="e7d39f03-2afe-4452-b4bf-7d113ddfbc95" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-16.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-16.png"/></a><figcaption>16 samples per pixel</figcaption></figure></div><div id="0fc699f3-44cc-4ded-9ec3-787664c09941" style="width:50%" class="column"><figure id="80db8e02-2263-4a60-82f3-82a4bd699833" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-2.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-2.png"/></a><figcaption>2 samples per pixel</figcaption></figure><figure id="9c19815d-2da5-4b45-9a99-6fff0dd7ddaa" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-8.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-8.png"/></a><figcaption>8 samples per pixel</figcaption></figure><figure id="11bcf14a-6be5-4f32-bd75-e0dfe3fc7ac3" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-64.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-64.png"/></a><figcaption>64 samples per pixel</figcaption></figure></div></div><figure id="b8af71d1-01e4-4d8b-ad34-0fcd46acbaf8" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-1024.png"><img style="width:384px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e-1024.png"/></a><figcaption>1024 samples per pixel</figcaption></figure><h1 id="782d14bb-4e16-4ff7-a924-4e838f729211" class=""><strong>Part 5: Adaptive Sampling</strong></h1><p id="eaf99334-ada7-4740-bdbc-a754b669f3af" class="">It is clear that global illumination results in the most realistic and physically-based renders. However, each frame requires anywhere from 30 seconds to 8 minutes of rendering, and even more if we want high resolution images. One idea is to use adaptive sampling: if we know that a pixel is not going to change significantly with more samples, let’s stop sampling that pixel.</p><figure id="e17128e1-5ee6-4c22-91e4-1373d64d295d" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/building-2048.png"><img style="width:432px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/building-2048.png"/></a><figcaption>this building is mostly black, so it doesn’t make sense to sample the black pixels millions of times.</figcaption></figure><ul id="93d9b9b9-e57a-4e2b-ae23-e4af6a40f94d" class="bulleted-list"><li style="list-style-type:disc">Explain adaptive sampling. Walk through your implementation of the adaptive sampling.</li></ul><p id="2f7d5549-e659-4fe6-afcc-cb672334f853" class="">To implement adaptive sampling, I first calculate the average illuminance and variance of each pixel. Pixels with high variance or low convergence (determined by <code>maxTolerance</code>) are sampled more. I then sample extra rays in those pixels and combine the results with the previous samples to produce a new estimate of the pixel&#x27;s colour. I repeat this process until the pixel converges to the desired level of noise—95% confident that the average illuminance is within <code>maxTolerance</code> of the mean—or the maximum number of samples per pixel is reached.</p><p id="cc9a0e5f-4bee-4d58-a37b-752b2b22f97b" class="">I don’t want to keep track of each sample’s illuminance <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">x_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span> to compute the mean and variance, so instead I keep s_1 and s_2, where</p><figure id="97d36b6a-000a-48c9-9e60-d15ed3b7a206" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.2500em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>x</mi><mi>k</mi></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow><mi>n</mi></munderover><msubsup><mi>x</mi><mi>k</mi><mi>s</mi></msubsup></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned} s_1 &amp;= \sum_{k=1}^n x_k \\ s_2 &amp;= \sum_{k-1}^n x_k^s \end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:6.565351000000001em;vertical-align:-3.0326755000000003em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.5326755000000003em;"><span style="top:-5.5326755em;"><span class="pstrut" style="height:3.6513970000000002em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.2791655em;"><span class="pstrut" style="height:3.6513970000000002em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.0326755000000003em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.5326755000000003em;"><span style="top:-5.5326755em;"><span class="pstrut" style="height:3.6513970000000002em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6513970000000002em;"><span style="top:-1.8478869999999998em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.302113em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.2791655em;"><span class="pstrut" style="height:3.6513970000000002em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6513970000000002em;"><span style="top:-1.8478869999999998em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.360444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-2.4530000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.0326755000000003em;"><span></span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="2157e73f-748b-42ce-a2a5-32ea3d93b9ca" class="">The mean and variance then become</p><figure id="6461c1a4-88e5-41b4-97e9-8698a2a68e62" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.2500em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>μ</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><msub><mi>s</mi><mn>1</mn></msub><mi>n</mi></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>σ</mi><mn>2</mn></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></mfrac><mo>⋅</mo><mo stretchy="false">(</mo><msub><mi>s</mi><mn>2</mn></msub><mo>−</mo><mfrac><msubsup><mi>s</mi><mn>1</mn><mn>2</mn></msubsup><mi>n</mi></mfrac><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned} \mu &amp;= \frac{s_1}{n} \\ \sigma^2 &amp;= \frac{1}{n-1} \cdot (s_2 - \frac{s_1^2}{n})\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.653998em;vertical-align:-2.076999em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.576999em;"><span style="top:-4.960546999999999em;"><span class="pstrut" style="height:3.4911079999999997em;"></span><span class="mord"><span class="mord mathnormal">μ</span></span></span><span style="top:-2.4834389999999997em;"><span class="pstrut" style="height:3.4911079999999997em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.076999em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.576999em;"><span style="top:-4.960546999999999em;"><span class="pstrut" style="height:3.4911079999999997em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1075599999999999em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-2.4834389999999997em;"><span class="pstrut" style="height:3.4911079999999997em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693300000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911079999999999em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-2.4518920000000004em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.24810799999999997em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.076999em;"><span></span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="6a306f8c-cb75-4a9a-af93-6337199eb55c" class="">Adaptive sampling greatly reduces the number of samples needed to converge to a certain level of noise, while still producing high-quality results. In my implementation, I used adaptive sampling to reduce the number of samples needed by up to 50% compared to uniform sampling. In the images below, you can see how in the places where the lighting is direct or nonexistent (the blue areas), adaptive sampling only sampled very few spots, whereas in the red areas, where the rendering is dependent on indirect lighting, adaptive sampling chose to sample almost the maximum number of samples.</p><div id="0a8d99b6-30eb-420d-99b2-ef96f71bf1c4" class="column-list"><div id="d39c21d3-40c1-4dd4-bd3c-a70afcd4ac22" style="width:50%" class="column"><figure id="19248e1c-67e5-4fbb-b606-8d042f553472" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e_2048.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e_2048.png"/></a></figure></div><div id="1ca96777-b2da-4baa-80a4-caa17225f4b7" style="width:50%" class="column"><figure id="d24654e2-ed5c-4eab-9a77-7d1b0a71b2aa" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e_2048_rate.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/wall-e_2048_rate.png"/></a></figure></div></div><div id="ee583ee2-7f66-4b78-ac50-2c6fda14121b" class="column-list"><div id="74816550-0b7d-4bc1-8d74-489c076c1814" style="width:50%" class="column"><figure id="f271844d-a4e5-46be-ac37-ecaf28d14e3b" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBspheres_lambertian_2048.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBspheres_lambertian_2048.png"/></a></figure></div><div id="b68045bc-39b3-4dbe-9a3d-21f022efb3e7" style="width:50%" class="column"><figure id="79368b4d-469f-44af-a9cd-8bf66b1a10e8" class="image"><a href="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBspheres_lambertian_2048_rate.png"><img style="width:480px" src="CS%20184%20Part%203-1%20Pathtracer%20fa5bb3306c6c48a9952b958d761f333f/CBspheres_lambertian_2048_rate.png"/></a></figure></div></div></div></article></body></html>
