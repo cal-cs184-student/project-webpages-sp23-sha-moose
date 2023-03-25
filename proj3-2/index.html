@@ -1,7 +1,669 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
-</html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>CS 184 Project 3-2: Pathtracer</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="bb651eb2-2fc7-49e7-b898-34dd73e532e4" class="page sans"><header><h1 class="page-title">CS 184 Project 3-2: Pathtracer</h1></header><div class="page-body"><p id="1981fe56-15a7-493b-bbc9-f505e990b95f" class="">Shamus Li | Spring 2023</p><p id="61d1aa23-5022-4f44-8208-652095f00c64" class="">Webpage URL: <a href="https://cal-cs184-student.github.io/project-webpages-sp23-sha-moose/proj3-2/index.html">https://cal-cs184-student.github.io/project-webpages-sp23-sha-moose/proj3-2/index.html</a></p><p id="25d74c6d-f4a5-4827-90c1-3be9ae8fe331" class="">In this project, I enhance the capabilities of the Pathtracer project by incorporating new material Bidirectional Scattering Distribution Functions (BSDFs) to achieve more realistic and diverse visualizations. The project is divided into two parts: in the first part, I implement mirror and glass models to capture the reflective and refractive properties of these materials, while in the second part, I focus on the implementation of the Microfacet model for isotropic rough conductors, allowing for a more accurate depiction of metallic surfaces. This was a very eye-opening project, as it expanded my perspective on the interaction of light rays and the scene objects.</p><h1 id="722d178a-339e-40ba-b595-97e2cef5dcc5" class="">Part 1: Mirror and Glass Materials</h1><p id="9f2e8334-6af1-44b3-8e61-386dff858ab9" class="">In order to implement glass and mirror materials, I started by implementing the reflection and refraction models. For the mirror material, I implemented the <code>MirrorBSDF::sample_f()</code> function, which reflects the light ray with respect to the normal. Unlike a Lambertian BSDF, a perfect mirror does not cause any falloff. The implementation returns reflectance divided by the absolute value of the cosine term <code>abs_cos_theta(*wi)</code> to cancel any multiplication in the implementation.</p><p id="2223f0b4-5ef5-4bd8-af71-3ae89dee6b78" class="">For the glass material, I first implemented the helper function <code>BSDF::refract()</code>, making use of Snell&#x27;s law to calculate the refraction. Similar to the mirror, glass refraction also doesn’t cause any falloff, so we have to divide by the cosine theta term as well. Lastly, I combined reflection and refraction to create a glass material by implementing <code>GlassBSDF::sample_f()</code>. I used Schlick&#x27;s approximation to determine the ratio of reflection energy to refraction energy and performed a coin-flip probability to either reflect or refract, which helped model the behavior of the glass material realistically.</p><p id="2ed460df-63b6-414c-b662-5d1539f0e203" class="">The below images were rendered with 1024 samples per pixel and 4 samples per light at different maximum ray depths. In each image, the new multibounce effects are shown by the gradual increase in the number of lighting effects, such as reflections and refractions. As the maximum ray depth increases, the images show more complex and intricate light interactions, resulting in a more realistic and detailed depiction of the scene.</p><div id="1eb3a8c3-3cb4-41b0-894a-d4474657bce4" class="column-list"><div id="37b9de3f-3231-45bb-9c79-53d93a268e33" style="width:50%" class="column"><figure id="012812da-1b45-4528-b408-a5ac57dc8131" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/0.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/0.png"/></a><figcaption><code>max_ray_depth</code>: 0</figcaption></figure></div><div id="8ae9a552-22ee-45ee-90bd-936949f18e8b" style="width:50%" class="column"><figure id="0272c302-ae21-4701-9510-c32e6514e13a" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/1.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/1.png"/></a><figcaption><code>max_ray_depth</code>: 1</figcaption></figure></div></div><p id="d7455240-87cf-4d5c-8126-0e1e46d01ce7" class="">In the first image, <code>max_ray_depth: 0</code>, only zero-bounce lighting is visible. In <code>max_ray_depth: 1</code>, direct lighting is visible. Finally, in the last image, <code>max_ray_depth: 100</code>, there are many more reflections and refractions, resulting in a complex and realistic lighting effect.</p><div id="4507d336-6026-4377-ae23-e46367d83f75" class="column-list"><div id="ea7c1c0e-84c9-48cb-96c9-128ed38ee6e2" style="width:50%" class="column"><figure id="4b271d1d-a2e4-481d-9523-17824095b1d8" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/2.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/2.png"/></a><figcaption><code>max_ray_depth</code>: 2</figcaption></figure></div><div id="93744a9f-cea4-4344-b265-9f3b2ffd0a4d" style="width:50%" class="column"><figure id="8a4d79ea-0688-4cef-a368-1be0ea3d4d61" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/3.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/3.png"/></a><figcaption><code>max_ray_depth</code>: 3</figcaption></figure></div></div><p id="f7377dd6-eee6-475d-965a-8bf6fb3e64ff" class="">When <code>max_ray_depth</code> is 2, we can see the reflection effects on the left sphere—and to a much lesser extent on the right sphere. There is no refraction at this point since two bounces is not sufficient to reach the light from the sensor. Refraction becomes visible when <code>max_ray_depth</code> is 3, both in the rendering of the right sphere and the focused white spot on the floor. It is important to notice that the reflected sphere in the left sphere is still dark, as the secondary refraction effects cannot be computed with this ray depth.</p><figure id="8c23bc7f-ddb4-482f-a72c-c3d301371de8" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/4.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/4.png"/></a><figcaption><code>max_ray_depth</code>: 4</figcaption></figure><p id="24eb3e4d-de90-425c-ad70-ced2bbaaa4ac" class="">When <code>max_ray_depth</code> becomes 4, there are many more reflections and refractions, resulting in a complex and realistic lighting effect. We see this in the right sphere, where the focused white spot reflects back onto the sphere. In addition, we see a spot on the right wall, where the refraction of the glass sphere has created a focused spot. In the first image, <code>max_ray_depth: 0</code>, only zero-bounce lighting is visible. The refracted ball in the mirror ball is now also realistically rendered. This is because a light ray must bounce at least 4 times to render these effects.</p><div id="9373e886-7506-4b79-85d9-1ab48e2700d3" class="column-list"><div id="a9ab6c2d-6cb6-4270-9bfe-d484f04f4f58" style="width:50%" class="column"><figure id="bc80b61e-64fe-4eb8-a302-6f8f5145894d" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/5.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/5.png"/></a><figcaption><code>max_ray_depth</code>: 5</figcaption></figure></div><div id="ec4f602d-c191-4fea-a993-3000b9c2710b" style="width:50%" class="column"><figure id="7de1ab2d-4f0b-4dbd-99f1-ada8cb91112a" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/6.png"><img style="width:432px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/6.png"/></a><figcaption><code>max_ray_depth</code>: 100</figcaption></figure></div></div><p id="853e41dd-69be-496e-a195-e4006f53be21" class="">Beyond <code>max_ray_depth: 4</code>, there exists some diminishing returns, as computation time grows and the image does not improve significantly. The last two images are slightly brighter, but aside from that the effects are not drastically different from <code>max_ray_depth: 4</code>.</p><h1 id="2acd371b-3e49-4799-8a7d-24709d85cca6" class="">Part 2: Microfacet Material</h1><p id="6976dfa8-4bfc-4447-9c74-dd0556136a8a" class="">To implement the Microfacet model for isotropic rough conductors, I first implemented the BRDF evaluation function <code>MicrofacetBSDF::f()</code> by correctly calling the Fresnel term, shadowing-masking term, and normal distribution function. Next, I overwrote the pre-implemented code for <code>MicrofacetBSDF::D()</code> to implement the normal distribution function using the Beckmann distribution. Then, I implemented the Fresnel term <code>MicrofacetBSDF::F()</code> for air-conductor interfaces, using the given approximation formula and refraction indices. Finally, I implemented the importance sampling function <code>MicrofacetBSDF::sample_f()</code> to sample the microfacet BRDF according to the shape of the Beckmann NDF, using the provided pdfs for θ and ϕ, and calculating the final pdf of sampling ωi with respect to solid angle. This allowed me to render the given scenes with different metal materials, such as copper, gold, aluminum, and silver, producing realistic and detailed images with various lighting effects.</p><p id="cff3686a-e782-4e76-96b6-e61890fbe2bc" class="">The roughness of the materials is controlled by <code>alpha</code>. Below, I explore different values for <code>alpha</code> and how it affects a copper dragon. Here, I used 1024 samples per pixel, 1 sample per light, and a <code>max_ray_depth</code> of 5. </p><div id="09a5e90b-a5cc-48b8-86bf-fdf588742cdc" class="column-list"><div id="b5aa140c-9296-4bd4-89b3-99b5b132d028" style="width:50%" class="column"><figure id="f8ae735d-e859-4d44-9397-4a257e40a87f" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/7.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/7.png"/></a><figcaption><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>l</mi><mi>p</mi><mi>h</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">lp</span><span class="mord mathnormal">ha</span></span></span></span></span><span>﻿</span></span>: 0.005</figcaption></figure></div><div id="40238074-027a-4366-bcb3-93f8c6348f0d" style="width:50%" class="column"><figure id="fee65d31-8ba7-4e1e-b82a-2e307db0355e" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/8.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/8.png"/></a><figcaption><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>l</mi><mi>p</mi><mi>h</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">lp</span><span class="mord mathnormal">ha</span></span></span></span></span><span>﻿</span></span>: 0.05</figcaption></figure></div></div><div id="7e14c655-09d3-4a81-86ad-019b04ab8978" class="column-list"><div id="c63c3e67-fb16-4098-8cbb-7ad9be890301" style="width:50%" class="column"><figure id="561d5bdc-dd75-4fc4-809d-634b348773ed" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/9.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/9.png"/></a><figcaption><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>l</mi><mi>p</mi><mi>h</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">lp</span><span class="mord mathnormal">ha</span></span></span></span></span><span>﻿</span></span>: 0.25</figcaption></figure></div><div id="490501b7-518f-46e7-81fc-63f492deb410" style="width:50%" class="column"><figure id="48c3101f-a324-4821-9c66-6ea0266f77cd" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/10.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/10.png"/></a><figcaption><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>l</mi><mi>p</mi><mi>h</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">lp</span><span class="mord mathnormal">ha</span></span></span></span></span><span>﻿</span></span>: 0.5</figcaption></figure></div></div><p id="dcd70230-1e21-4326-be65-c1f4802b8f3c" class="">To show the effectiveness of importance sampling, I rendered <code>CBbunny_microfacet_cu.dae</code> using both the default cosine hemisphere sampling method and importance sampling. Here, I used 64 samples per pixel, 1 sample per light, and a <code>max_ray_depth </code>of 5. It is clear that importance sampling does a much better job, mainly due to its efficiency in sampling key directions in the distribution. Cosine hemisphere sampling, on the other hand, uses a uniform PDF, which generates a lot of samples in directions that contribute little to the final result, leading to worse results at the same render settings.</p><div id="1ae783f0-1133-4a99-8981-a286e97ff4e8" class="column-list"><div id="2530991b-e842-43f0-9d8b-7eba2b02cdac" style="width:50%" class="column"><figure id="1a7a2b6d-2a39-46b7-b7f6-70442477cc17" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/11.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/11.png"/></a><figcaption>cosine hemisphere sampling</figcaption></figure></div><div id="dfb55b60-8992-4a4a-b469-192efdcc1e57" style="width:50%" class="column"><figure id="b927be3f-24c3-4fcf-a22a-d961b402d6a8" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/12.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/12.png"/></a><figcaption>importance sampling</figcaption></figure></div></div><p id="ab032514-069c-4f79-84fa-ee95f06d8bb5" class="">Using <a href="https://refractiveindex.info/">https://refractiveindex.info</a>, I I found <code>eta</code> and <code>k</code> data for other materials, including cobalt, silver, and iron. To get the three values needed, I used 0.580nm for the red channel, 0.530nm for green, and 0.430nm for blue, although other values may produce different results. By substituting these results into <code>CBDragon_microfacet.dae</code>, I was able to obtain the following images.</p><table id="31d7002f-e731-4583-8029-b802967f5bb1" class="simple-table"><thead class="simple-table-header"><tr id="7aebbcde-3580-44fa-a7f0-b2cfe94d7842"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">object</th><th id="gKEE" class="simple-table-header-color simple-table-header" style="width:174.5px">silver (ag)</th><th id="sNRI" class="simple-table-header-color simple-table-header" style="width:174.5px">iron (fe)</th><th id="fdcm" class="simple-table-header-color simple-table-header" style="width:174.5px">cobalt (co)</th></tr></thead><tbody><tr id="ce05d4b7-b9d6-4e91-a9bf-ea265ae81fba"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">eta_r (580nm)</th><td id="gKEE" class="" style="width:174.5px">0.050627</td><td id="sNRI" class="" style="width:174.5px">2.9406</td><td id="fdcm" class="" style="width:174.5px">2.1252</td></tr><tr id="7997be20-0148-4a8c-8234-5628b7935bd7"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">eta_g (530nm)</th><td id="gKEE" class="" style="width:174.5px">0.053285</td><td id="sNRI" class="" style="width:174.5px">2.8889</td><td id="fdcm" class="" style="width:174.5px">1.9957</td></tr><tr id="72de3df4-2eb2-4a25-ab71-6528af6339c7"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">eta_b (430nm)</th><td id="gKEE" class="" style="width:174.5px">0.040291</td><td id="sNRI" class="" style="width:174.5px">2.4728</td><td id="fdcm" class="" style="width:174.5px">1.6667</td></tr><tr id="a5889060-33e4-418c-9491-718bf42b991b"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">k_r (580nm)</th><td id="gKEE" class="" style="width:174.5px">3.8409</td><td id="sNRI" class="" style="width:174.5px">2.9864</td><td id="fdcm" class="" style="width:174.5px">3.9515</td></tr><tr id="894eeeff-6fcb-4aa9-9c63-8a3dc2d315b4"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">k_g (530nm)</th><td id="gKEE" class="" style="width:174.5px">3.4101</td><td id="sNRI" class="" style="width:174.5px">2.9164</td><td id="fdcm" class="" style="width:174.5px">3.7250</td></tr><tr id="e1a5e1b3-88f9-4c32-9285-2517a40dc095"><th id="[Z]{" class="simple-table-header-color simple-table-header" style="width:174.5px">k_b (430nm)</th><td id="gKEE" class="" style="width:174.5px">2.4566</td><td id="sNRI" class="" style="width:174.5px">2.7067</td><td id="fdcm" class="" style="width:174.5px">3.1633</td></tr></tbody></table><div id="f43ab39e-a2c0-4bbc-8f60-7c7052b4524c" class="column-list"><div id="d38ea355-d01d-4c5c-ba10-50e8f219a94a" style="width:50%" class="column"><figure id="2e9f0042-c522-45ec-a09b-39048207fa68" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/13.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/13.png"/></a><figcaption>cobalt dragon (<code>alpha</code> = 0.3)</figcaption></figure></div><div id="4bb7be97-9611-4b72-925e-aefad3d8230c" style="width:50%" class="column"><figure id="0bd535e0-d5b5-4596-b6b3-d7b968de4476" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/cobalt_Large.jpeg"><img style="width:1280px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/cobalt_Large.jpeg"/></a><figcaption>cobalt in real life</figcaption></figure></div></div><div id="54c3130b-53fb-4a99-9f2f-922b60bae3c1" class="column-list"><div id="373a20db-8bdd-4d6f-bbd4-57394d3b22df" style="width:50%" class="column"><figure id="0d37d26d-73c6-4430-b86a-8b8a20cf9fa3" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/15.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/15.png"/></a><figcaption>silver dragon (<code>alpha</code> = 0.5)</figcaption></figure></div><div id="97d98bcc-7905-435c-85c0-d5b958b71741" style="width:50%" class="column"><figure id="d7d21772-e6ee-4424-b1a3-c7bf5613460d" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/silver_Large.jpeg"><img style="width:702px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/silver_Large.jpeg"/></a><figcaption>silver in real life</figcaption></figure></div></div><div id="370b3be9-e381-4ae2-b691-85b03fb2d80d" class="column-list"><div id="30be0c71-2f56-47ef-b7fc-cbff2777b7b3" style="width:50%" class="column"><figure id="15f53aaf-088e-4f05-b058-d280a8b5887c" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/16.png"><img style="width:480px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/16.png"/></a><figcaption>iron dragon (<code>alpha</code> = 0.3)</figcaption></figure></div><div id="0d9953c8-2252-466d-a3fa-990e4d57638c" style="width:50%" class="column"><figure id="ba18976c-459e-4440-9651-06b06b5d1575" class="image"><a href="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/iron_Large.jpeg"><img style="width:400px" src="CS%20184%20Project%203-2%20Pathtracer%20bb651eb22fc749e7b89834dd73e532e4/iron_Large.jpeg"/></a><figcaption>iron in real life</figcaption></figure></div></div></div></article></body></html>
