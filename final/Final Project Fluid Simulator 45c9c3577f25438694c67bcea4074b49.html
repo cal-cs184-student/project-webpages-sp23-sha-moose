@@ -1,0 +1,672 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Final Project: Fluid Simulator</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="45c9c357-7f25-4386-94c6-7bcea4074b49" class="page sans"><header><h1 class="page-title">Final Project: Fluid Simulator</h1></header><div class="page-body"><h3 id="0bff50f8-66c7-4393-9a80-5242eaf5594c" class="">Eric Li, Shamus Li, Hailey Park, Omar Yu | CS 184 Spring 2023</h3><p id="04cc3907-9726-46e0-9d0d-3e3d8289984a" class="">Short Summary: Our goal is to create working <strong>3d fluid simulation</strong>. We aim to create a scene where different objects are dropped into a body of water confined by a transparent cube. The final product is an animation and will involve both computing the physics of the water and rendering of it.</p><h1 id="13f84819-12af-46b5-a6ba-350567ee7bf9" class="">Problem Description</h1><p id="93c553d4-48b0-4d4f-9bd1-e7dc0fbb2efc" class="">Fluid simulation is an important problem since we would like to model fluids in our animations and renders. It is challenging however because fluids are modeled by complicated physics equations that are computationally expensive to compute. We aim to solve this by implementing a 3-dimensional particle based simulation. </p><h1 id="4e83705c-3213-4373-8862-fe02ac887604" class="">Goals and Deliverables</h1><h2 id="c39a3681-e638-45a8-948a-d2ccf8aeb997" class="">Goals</h2><ul id="a0537f0f-16bb-429c-912c-0376ba698b45" class="bulleted-list"><li style="list-style-type:disc">By implementing this fluid simulation, we hope to answer these questions:<ul id="25b78e77-fde8-45e1-8bb3-1f050597eda7" class="bulleted-list"><li style="list-style-type:circle">Can we accurately simulate fluid mechanics?</li></ul><ul id="cc49cbb5-0969-46f9-939a-05b1d997e504" class="bulleted-list"><li style="list-style-type:circle">Can we make it look good?</li></ul><ul id="7318752e-e066-4c24-8d9a-21e20bfcc3e2" class="bulleted-list"><li style="list-style-type:circle">Can we fulfill these goals without having it be too computationally expensive?</li></ul></li></ul><h2 id="07ba1eee-c322-4414-b4be-c0c5c2830173" class="">Planned Deliverables</h2><ul id="41df1e7e-e840-4222-b8a9-e04a05034edc" class="bulleted-list"><li style="list-style-type:disc">Make a working fluid simulator (particle-based)<ul id="6ea03832-0e82-49b6-a11f-f75a44fe715e" class="bulleted-list"><li style="list-style-type:circle">Compute collisions of water</li></ul><ul id="0275f1c9-c3ad-415f-a049-5bcd0f7693bb" class="bulleted-list"><li style="list-style-type:circle">Render the water</li></ul><ul id="58e34a2f-6698-4ffa-8bfb-5e4e6bc55212" class="bulleted-list"><li style="list-style-type:circle">Make optimizations to make the code run fast <ul id="1848bde5-96fa-4c59-a824-33a9f5dc8175" class="bulleted-list"><li style="list-style-type:square">We will measure performance by timing the rendering speed for our simulation, and potentially visualize this with a graph showing speedup</li></ul></li></ul></li></ul><ul id="2b31ebcd-8c2b-42a3-9a3e-a54864b161f3" class="bulleted-list"><li style="list-style-type:disc">Simulate dropping multiple different objects into a body of water<ul id="991aa17e-5fee-43fd-b998-584cca473a44" class="bulleted-list"><li style="list-style-type:circle">Will simulate how objects of different sizes/shapes/mass affect the splash simulation</li></ul><ul id="55746af3-cca1-4852-b0aa-b8b8abf08dbc" class="bulleted-list"><li style="list-style-type:circle">Bounding box of the scene/water should be small to optimize</li></ul></li></ul><p id="0081da15-9774-4fe8-ad45-b86f7021c16a" class="">Here are some example images of what we hope to create:</p><figure id="3127652b-a92b-4b4b-95d7-b775950b1bf6" class="image"><a href="https://joshua16266261.github.io/184-water-sim/final-report/images/final-diffuse.gif"><img style="width:240px" src="https://joshua16266261.github.io/184-water-sim/final-report/images/final-diffuse.gif"/></a></figure><p id="bb897c91-a865-465e-a470-eee8dbaaf128" class="">Source: “CS184: Realistic Water Simulation with Spray, Foam, and Bubbles” by Marcus Lee, Joshua Chen, Fourth Teerakapibal, Calvin Pham </p><figure id="def0ebed-32a4-43cd-9ae5-542c46cdefe6" class="image"><a href="https://yidingjiang.github.io/cs184sp18_final/img/title_particle.png"><img style="width:288px" src="https://yidingjiang.github.io/cs184sp18_final/img/title_particle.png"/></a></figure><p id="6552a808-089c-471f-8e01-5925abe65097" class="">CS 184: Computer Graphics and Imaging, Spring 2018
+Final Project: 3D Position Based Fluid Simulation and Surfacing
+Gauthier Dieppedalle, Utkarsh Singhal, YiDing Jiang</p><h2 id="a5e5911b-c1f2-451a-9eb9-fc1183023ff9" class="">Hopeful Deliverables</h2><ul id="661c463c-5822-4025-b3ba-5ca66005cc8e" class="bulleted-list"><li style="list-style-type:disc">Real time semi-realistic water simulation<ul id="d4c2cf84-0dfe-4efb-8070-02a6119e862f" class="bulleted-list"><li style="list-style-type:circle">User can drag around objects and drop into the water from any location/height</li></ul><ul id="3c8d1aa2-0a24-481f-9c90-b40464579bb9" class="bulleted-list"><li style="list-style-type:circle">Will likely require refactoring code to use GPU</li></ul></li></ul><ul id="b714dc62-fdbd-471e-b0df-d0f5f362ba66" class="bulleted-list"><li style="list-style-type:disc">Simulate dropping a small volume of water on objects — surface tension and dripping mechanics</li></ul><h1 id="43105311-0134-4783-83d8-144e1a102fba" class="">Schedule</h1><h2 id="bbac1df6-28a4-4a7b-827f-a3bb4246f837" class=""><span style="border-bottom:0.05em solid">Week 1: 4/10 - 4/16</span></h2><h3 id="a044afe9-3461-4e30-99fe-4a3d82c5ad49" class="">Important Dates</h3><ul id="43cf4e4c-cb30-4bf3-a8e5-ebe534705700" class="bulleted-list"><li style="list-style-type:disc">Project Feedback by 4/10</li></ul><h3 id="f5d0026d-8fa3-442d-9e98-0c59448eda8b" class="">Tasks</h3><p id="b412fc7a-7bed-4484-abeb-430ea5827fc4" class="">Objective: Study and learn from resources to properly understand what we want to accomplish, begin development of project if able to:</p><ul id="34ca2550-14ce-45e2-8a54-df111999ec61" class="bulleted-list"><li style="list-style-type:disc">Take proposal feedback into account and refactor if necessary</li></ul><ul id="3c94a826-a735-4804-8c78-9528d25f909e" class="bulleted-list"><li style="list-style-type:disc">Read research papers, articles, documentation, etc. and watch videos on relevant topics</li></ul><ul id="efa12330-f846-46c2-9f06-7a6ce92a5431" class="bulleted-list"><li style="list-style-type:disc">If comfortable, start working on a barebones implementation of a fluid simulator</li></ul><h2 id="3a1ebadb-fa30-423b-9e4e-c5cf5222aef5" class=""><span style="border-bottom:0.05em solid">Week 2: 4/17 - 4/23</span></h2><h3 id="999c26a7-1b62-487a-9077-e69a87621e51" class="">Important Dates</h3><ul id="c5437504-1fc9-4e8f-b173-2b95756efeca" class="bulleted-list"><li style="list-style-type:disc">N/A</li></ul><h3 id="c44a24df-93c4-49af-b3dd-1ca6f7aaf05e" class="">Tasks</h3><p id="96613b18-ea08-4d23-9d2a-466490d05c95" class="">Objective: Begin/continue development of the project, iterate and build upon previous week’s work:</p><ul id="18c8d2b4-95ee-4d66-8ae0-1b6574b45524" class="bulleted-list"><li style="list-style-type:disc">Attempt to complete a <strong>working</strong> fluid simulator, even if it is one that is extremely inefficient and not entirely accurate.</li></ul><h2 id="9df957cd-3b8a-4764-a33d-90c1d1bf2728" class=""><span style="border-bottom:0.05em solid">Week 3: 4/24 - 4/30</span></h2><h3 id="23189f2d-40c8-4b10-a012-a57bdf47aee0" class="">Important Dates</h3><ul id="dfe268d6-0e9b-479c-9cf5-573c041185dc" class="bulleted-list"><li style="list-style-type:disc">Milestone due on 4/25</li></ul><ul id="cb7b3348-d0f2-4ba8-9a1b-4ca4f4b13b92" class="bulleted-list"><li style="list-style-type:disc">Milestone feedback by 4/27</li></ul><h3 id="66a58ddd-2dd6-41f5-9562-b344b568d8b3" class="">Tasks</h3><p id="de0135f3-8732-4d0f-a531-6774ea2ef3c3" class="">Objective: Submit Milestone and finish main development of the project:</p><ul id="8f91a6cd-6a8c-4b19-bdf4-e47e91a78b05" class="bulleted-list"><li style="list-style-type:disc">Milestone status report webpage</li></ul><ul id="1350d4ea-9821-488c-98e5-9eb0c3b4574d" class="bulleted-list"><li style="list-style-type:disc">Milestone video</li></ul><ul id="ed83d695-b220-40df-bac4-c8acc0552f6b" class="bulleted-list"><li style="list-style-type:disc">Presentation slides</li></ul><ul id="c47391f7-8378-4fee-8add-ad90746a5aa2" class="bulleted-list"><li style="list-style-type:disc">Optimize fluid simulator and add new features</li></ul><ul id="b43db321-bfda-43cf-a5cd-497b1b68971e" class="bulleted-list"><li style="list-style-type:disc">Work on hopeful deliverables if we finish the main deliverables early</li></ul><h2 id="88233c0b-763d-4498-8755-742090b45a33" class=""><span style="border-bottom:0.05em solid">Week 4: 5/1 - 5/3</span></h2><h3 id="e68c9ff2-c587-4eee-8769-28a43be46c9b" class="">Important Dates</h3><ul id="7043b7df-927b-4515-9b11-8e1ee948f777" class="bulleted-list"><li style="list-style-type:disc">Final presentations on 5/3 - 5/4</li></ul><ul id="2e621532-9b70-4b74-893f-4252ecc3fb10" class="bulleted-list"><li style="list-style-type:disc">Final deliverables due 5/4</li></ul><h3 id="280284ea-1b8f-475e-ba9e-ce3938733092" class="">Tasks</h3><p id="84e3834e-69d1-4008-9297-d3a276cb9023" class="">Objective: Wrap up project by finishing final deliverables and prepare for presentations:</p><ul id="b41e489e-0856-4eb3-8ae8-44915509c674" class="bulleted-list"><li style="list-style-type:disc">Final Video</li></ul><ul id="389671a3-c14f-4d88-ad1a-b2563b1bcced" class="bulleted-list"><li style="list-style-type:disc">Final Report Webpage</li></ul><ul id="90a287fa-cc87-4e5c-9f2e-5ec5bde64114" class="bulleted-list"><li style="list-style-type:disc">Peer Review Form</li></ul><h1 id="fbf4af6a-1b1a-4eb1-8964-c6de7d0c0c69" class="">Resources</h1><ul id="ac9c7e24-4cfe-490b-af7b-7c88f65cfb05" class="bulleted-list"><li style="list-style-type:disc">CS 184: 3D Position Based Fluid Simulation and Surfacing<ul id="5bc54cd2-c5df-452b-8ed9-6c2e0251c8ed" class="bulleted-list"><li style="list-style-type:circle"><a href="https://yidingjiang.github.io/cs184sp18_final/">https://yidingjiang.github.io/cs184sp18_final/</a></li></ul></li></ul><ul id="ffd44fb7-408e-4d98-a755-664daebae926" class="bulleted-list"><li style="list-style-type:disc">CS 184: Realistic Water Simulation with Spray, Foam, and Bubbles<ul id="c4ea6c8b-8da2-4ed4-b9a6-232722fc3a52" class="bulleted-list"><li style="list-style-type:circle"><a href="https://joshua16266261.github.io/184-water-sim/final-report/index.html">https://joshua16266261.github.io/184-water-sim/final-report/index.html</a></li></ul></li></ul><ul id="2176573d-494a-4dec-a02f-74582b778377" class="bulleted-list"><li style="list-style-type:disc">Position Based Fluids<ul id="e7fd64d1-abcb-4dc3-bdae-34bf0770cea5" class="bulleted-list"><li style="list-style-type:circle"><a href="http://mmacklin.com/pbf_sig_preprint.pdf">http://mmacklin.com/pbf_sig_preprint.pdf</a></li></ul></li></ul><ul id="de62d54b-0c40-4054-b120-4ff526e081a3" class="bulleted-list"><li style="list-style-type:disc">Thin Film Fluid Simulation<ul id="bfd8e58e-2cca-4c1b-8b9b-c6ced277caac" class="bulleted-list"><li style="list-style-type:circle"><a href="http://alexey.stomakhin.com/research/siggraph2019_drips.pdf">http://alexey.stomakhin.com/research/siggraph2019_drips.pdf</a></li></ul></li></ul><ul id="9bf7ee78-621b-40b3-94e3-6b0250c4c348" class="bulleted-list"><li style="list-style-type:disc">How to Write a FLIP Water Simulator<ul id="137f0412-d0ae-4b74-a0c9-cb160a2a85ca" class="bulleted-list"><li style="list-style-type:circle"><a href="https://matthias-research.github.io/pages/tenMinutePhysics/18-flip.pdf">https://matthias-research.github.io/pages/tenMinutePhysics/18-flip.pdf</a></li></ul></li></ul><ul id="fdec71a6-8682-44ac-a34b-81bcfdb1e0d5" class="bulleted-list"><li style="list-style-type:disc">We plan on extending an existing framework such as OpenGL for the basic rasterizing pipelines.</li></ul><ul id="ea239cb1-4b63-4243-bc7f-20dff8f0408d" class="bulleted-list"><li style="list-style-type:disc">If we are provided some skeleton code we also plan on using it.</li></ul><ul id="4ce5b9e2-76e1-4879-95c0-2eadf61d7992" class="bulleted-list"><li style="list-style-type:disc">If we end up behind schedule, we may use Blender to do the rendering instead and focus on the physical modeling.</li></ul><p id="7284cd00-4bd2-425d-b0d1-9d704807f964" class="">
+</p></div></article></body></html>
