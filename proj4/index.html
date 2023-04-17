@@ -1,7 +1,669 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 4 here
-	</body>
-</html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>CS 184 Project 4: Clothsim</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="f8ccf3de-53f6-4eb4-b5b5-295024912818" class="page sans"><header><h1 class="page-title">CS 184 Project 4: Clothsim</h1></header><div class="page-body"><p id="86b38afb-3a3b-4c8d-a7a1-36677ff093b9" class="">Shamus Li | Spring 2023</p><p id="7e04f8cb-f22d-4c4f-a53b-58e2881d52c6" class="">Webpage URL: <a href="https://cal-cs184-student.github.io/project-webpages-sp23-sha-moose/proj4/">https://cal-cs184-student.github.io/project-webpages-sp23-sha-moose/proj4/</a></p><p id="197da655-fa19-4c38-8e0d-b879319de1ff" class="">In this project, I simulated cloths using a mass and spring model. I implemented the simulation step with numerical integration, as well as handled collisions. Finally, I wrote shaders that implemented lighting effects—from Phong shading to water textures—on the cloth and 3D primitives. I have never worked with physical simulation before, and I thought this project was the most fulfilling of all the projects so far for me.</p><h1 id="fe2888cd-b665-458e-80f8-47be8adfe61a" class="">Part 1: Masses and springs</h1><p id="c181f893-a804-4bcd-b39b-2c9420871cd2" class="">Below, I showcase the wireframe that I created. The model consists of a grid of masses connected to each other via a system of springs that act as constraints on the cloth. there are structural and bending constraints on-axis, as well as shearing constraints off-axis.</p><figure id="5c75e61b-e56e-458a-b40a-59fe441d85f3" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.01.13_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.01.13_PM.png"/></a><figcaption>all the constraints enabled in <em>scene/pinned2.json</em></figcaption></figure><div id="c856cf17-2118-4d25-ad54-318c1fd272d5" class="column-list"><div id="a99b3879-01a7-497a-8623-618e05d23d6b" style="width:50%" class="column"><figure id="c8095464-aa43-4600-8203-f73adeeef8f7" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.03.52_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.03.52_PM.png"/></a><figcaption>without any shearing constraints</figcaption></figure></div><div id="8862029d-b7bf-4cab-bfc4-c6004b427d4a" style="width:50%" class="column"><figure id="32d0f347-df5e-4729-883a-1869c8c3b751" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.03.37_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.03.37_PM.png"/></a><figcaption>shearing constraints only</figcaption></figure></div></div><h1 id="8a402830-96b1-4d50-a4bc-61bdf33c298d" class="">Part 2: Simulation via numerical integration</h1><p id="231649ed-11e4-4704-9196-11edb964d1c8" class="">Cloth simulation involves modelling the behaviour of a cloth as it moves and interacts with other objects in a virtual environment. To do this, I used the Verlet integration method. This method involves calculating the position of each particle at the next time step based on its current position and velocity, as well as the acceleration of the particle due to internal and external forces.</p><p id="00e72f39-c967-411c-9978-403d3e3bd4b0" class="">I tried to vary some parameters using <em><em><em><em><em><em><em><em><em><em><em><em><em><em><em>scene/pinned2.json</em></em></em></em></em></em></em></em></em></em></em></em></em></em></em>. The default parameters result in a relatively realistic cloth dangling from two pinned positions.</p><figure id="439ec88f-105e-4d2b-babf-8f407dc280e5" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/default.gif"><img style="width:528px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/default.gif"/></a><figcaption>default parameters</figcaption></figure><p id="8f090347-eff5-4a1e-8649-d6ed453a049b" class="">When the spring constant <code>ks</code> is small, the cloth appears more fluid and flexible, as it allows the particles to move more freely and stretch further. This is similar to lightweight fabrics such as silk or chiffon, which have a lot of drape and movement. A high <code>ks</code> results in a stiffer and more rigid cloth, as it restricts the movement of the particles and limits how far they can stretch. This is more akin to heavier fabrics such as denim or canvas.</p><div id="270679b0-def8-429f-9b3d-74ebf84bf85b" class="column-list"><div id="95970c6e-88fd-439e-8d12-0a224f999403" style="width:50%" class="column"><figure id="ca991044-95e6-411f-bcbc-9f116cb94b38" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-ks.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-ks.gif"/></a><figcaption>low <code>ks</code> (10)</figcaption></figure></div><div id="6021c966-028a-4a95-9389-44830ec0d74e" style="width:50%" class="column"><figure id="1dcc5bf6-4455-4862-ab66-6f3aa80410d6" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-ks.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-ks.gif"/></a><figcaption>high <code>ks</code> (100000)</figcaption></figure></div></div><p id="6e652b23-256d-496e-b08a-e2cc16253823" class="">When varying the density, the cloth’s movement changes. The low density cloth acts like a feather, with more fluid more smaller scale movements. Because there is less mass in the same area, the cloth is less responsive to the force due to gravity. In contrast, the higher density cloth is more responsive to gravity, and in the final resting state buckles more due to gravity. As a result, it also had more exaggerated wrinkles.</p><div id="7535cf02-0256-4b39-8bf4-7ce00c0b2335" class="column-list"><div id="e2390ee3-dcab-4d83-bfe1-9c23348a4277" style="width:50%" class="column"><figure id="298fafcf-177b-4822-8389-d354d0a60eff" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-density.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-density.gif"/></a><figcaption>low <code>density</code> (1)</figcaption></figure></div><div id="cb9eb97a-7942-4375-b8fc-234b521e6442" style="width:50%" class="column"><figure id="d01d70e2-bba9-459d-b862-118cafe6035c" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-density.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-density.gif"/></a><figcaption>high <code>density</code> (1000)</figcaption></figure></div></div><p id="b0832cde-1559-4ee9-9071-bd4f3d0f68a1" class="">A low damping value in the cloth simulation results in a cloth that is more fluid and flexible. This leads to more exaggerated movements, as shown in the GIF. A high damping value results in a cloth that is more rigid and less flexible, as the particles and constraints are more strongly affected by damping forces that resist motion. Here, the movement becomes slow and stiff.</p><div id="df4b283a-d7b0-4ce4-8ce0-ef0fc27296cd" class="column-list"><div id="68fd6e87-688a-4e1d-a49a-ca4c29576e81" style="width:50%" class="column"><figure id="fc1258ee-d446-4f59-a514-5b3919f6e980" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-damping.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low-damping.gif"/></a><figcaption>low <code>damping</code> (0%)</figcaption></figure></div><div id="36138890-e6d4-49c2-9352-203f889198af" style="width:50%" class="column"><figure id="4fa2ad80-ae74-43fa-8f80-3fe69265d7e5" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-damping.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high-damping.gif"/></a><figcaption>high <code>damping</code> (1%)</figcaption></figure></div></div><p id="7e3c4b2b-6c66-47de-8c4b-d288caeaa255" class="">I also tested my simulation using <em>scene/pinned4.json. </em>Here is its final resting state using default parameters.</p><figure id="a36c14d0-1df5-41be-99f3-46bf42519b4b" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.20.43_PM.png"><img style="width:672px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.20.43_PM.png"/></a><figcaption><em>scene/pinned4.json</em> in its final resting state.</figcaption></figure><h1 id="bd98e1ae-3e81-44dd-8768-803cbecd43a6" class="">Part 3: Handling collisions with other objects</h1><p id="74149318-fe0e-4bfe-87cf-51a8d59d4e23" class="">In this section, I implemented collisions with other objects using a collision detection system that applied a correction to the position of the cloth based on the distance between the intersecting points and the surface of the object when there was a collision. I implemented collisions with spheres and planes.</p><p id="1e32b918-05c8-4907-8a1d-5c8797f88b1b" class="">Below, I show a cloth collision with a sphere using different spring constant <code>ks</code> values. If the spring constant of the cloth is low, the constraints between the particles are more flexible and allow for greater deformation of the cloth. As a result, the cloth using <code>ks = 500</code> clings much closer to the sphere. On the other hand, the cloth using <code>ks = 50000</code> is much more stiff and maintains its shape more when draped over the sphere. </p><figure id="586f0b08-9b0c-4612-bbcd-677db752c8ca" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.40.36_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.40.36_PM.png"/></a><figcaption><code>ks = 5000</code></figcaption></figure><div id="d8b8f3c6-9d0d-4790-98eb-725265a561ab" class="column-list"><div id="87369906-68ec-4423-b719-b2d120ebd3b8" style="width:50%" class="column"><figure id="5c340206-5665-4649-a5b7-b46cc2f6685c" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.40.56_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.40.56_PM.png"/></a><figcaption><code>ks = 500</code></figcaption></figure></div><div id="bc4ec61f-0e99-43e8-bf68-4be4726eb78c" style="width:50%" class="column"><figure id="31e05186-be26-41d5-9627-83ea865f5296" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.41.17_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.41.17_PM.png"/></a><figcaption><code>ks = 50000</code></figcaption></figure></div></div><p id="48cf610f-f3e5-46ca-9f6a-62d76a88875d" class="">I also implemented collisions between a plane and the cloth. Below, I include a screenshot of <em>scene/plane.json</em>. <div class="indented"><figure id="a286ef48-c80e-49b8-9bcd-0061041bfe83" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.43.13_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.43.13_PM.png"/></a></figure></div></p><h1 id="1e883ea7-1f90-4b72-b57e-fc7f54156a65" class="">Part 4: Handling self-collisions</h1><p id="aa619d80-20f7-4912-b25c-ee22dcd2c789" class="">In this part, I implemented self-collisions for the cloth using a hashing algorithm to efficiently detect and respond to collisions between nearby particles. This is computationally efficient because it allows for collision detection without comparing all pairs of particles. Below, I show three screenshots that document how the cloth folds on itself.</p><div id="0fce94f3-745e-475b-b0aa-52c667c3b5db" class="column-list"><div id="3d34a0cb-9acb-49a8-8527-9d47b04ab391" style="width:50%" class="column"><figure id="93714716-155f-4fa3-b858-44576964272b" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.48.49_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.48.49_PM.png"/></a><figcaption>the cloth beginning to fold on itself</figcaption></figure></div><div id="ea7f1e8f-8ddc-4177-b105-576ac7ca3eef" style="width:50%" class="column"><figure id="e953ba7d-c074-4ee1-8692-3c56a6aea581" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.48.59_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.48.59_PM.png"/></a><figcaption>The cloth almost fully collapsed</figcaption></figure></div></div><figure id="a2cc95db-74fe-43ce-8e22-1676d16dc1ac" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.49.08_PM.png"><img style="width:576px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.49.08_PM.png"/></a><figcaption>the final resting state of the cloth on the plane</figcaption></figure><p id="91e4e82f-f8c2-43a1-86cc-e7f4348eadae" class="">I repeated this simulation but varied the density and spring constant <code>ks</code> values. The density of the cloth affects its mass and flexibility, and therefore its response to external forces and collisions. A lower density cloth moves more slowly, and also has fewer folds. On the other hand, a higher density cloth is heavier and has much more exaggerated movement.</p><p id="74a8477f-8b61-49d1-aa54-9226bceecfaf" class="">The spring constant of the cloth affects the stiffness of the constraints between particles, and therefore its internal forces and overall behaviour. A low <code>ks</code> creates a flexible and fluid cloth and a large <code>ks</code> creates a stiffer cloth with significantly fewer folds. </p><div id="da4d2972-cfa1-4174-a0e1-ee0aefe3e87d" class="column-list"><div id="1d09dbd3-1252-4328-8e0f-86820ece3f0c" style="width:50%" class="column"><figure id="b0217d58-a71f-42b2-b305-c2adbf7d3820" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low_density.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low_density.gif"/></a><figcaption>low <code>density</code> (1)</figcaption></figure></div><div id="b45a0b48-e41c-47b7-90cf-21a2864635dc" style="width:50%" class="column"><figure id="85f07fea-4a33-4306-ad80-dfef1b84c22b" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high_density.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high_density.gif"/></a><figcaption>high <code>density</code> (100)</figcaption></figure></div></div><div id="3a9f95c4-280c-4fa9-890e-3668a2a1a708" class="column-list"><div id="3daf1e30-6ae2-4476-b5c8-bee8a1c0a773" style="width:50%" class="column"><figure id="b0ca44d6-8e85-40d2-971a-bb2ae7366257" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low_ks.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/low_ks.gif"/></a><figcaption>low <code>ks</code> (10)</figcaption></figure></div><div id="3d88b903-7158-43ec-827d-db4087296143" style="width:50%" class="column"><figure id="8a271b61-597e-43bc-8133-4f30c74da462" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high_ks.gif"><img style="width:458px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/high_ks.gif"/></a><figcaption>high <code>ks</code> (100000)</figcaption></figure></div></div><h1 id="da64083d-7c6b-4082-8703-437d7e7907a7" class="">Part 5: Shaders</h1><p id="d0136a79-8bbe-4404-8b14-6bbe08f13fa2" class="">In this part, I implement several shaders that are used in the cloth simulation. Shader programs are used to control the appearance of 3D objects by defining their lighting, materials, and other visual properties. </p><p id="7732be9c-869c-422d-8e6f-9a3b7ffdc3e5" class="">A vertex shader is responsible for processing the vertices (or points) of 3D objects, transforming them from their local coordinates to world coordinates, and then projecting them onto a 2D plane for display on the screen. As a result, it can perform transformations on the vertices of the object.</p><p id="58426a15-02e2-4453-9afe-b1c4d3da425c" class="">Once the vertices have been transformed by the vertex shader, they are passed on to the fragment shader. The fragment shader is responsible for processing each pixel (or fragment) of the 3D object, determining its colour and other visual properties based on lighting and material information. Thus, the fragment shader can create realistic lighting and material effects, but cannot actually shift the location of anything. </p><p id="aa8593a7-3f82-45dc-a090-c0cf2b63fafe" class="">The first shader I implemented is the Blinn-Phong shading model. The Blinn-Phong model calculates the colour of a surface based on three components: ambient, diffuse, and specular. The ambient component is a constant value that represents the general illumination of the scene. It is typically set to a low value, as it is meant to represent the light that is scattered and reflected by the many, but weak bounce light rays in the environment. Here, I have exaggerated the value to make it more visible.</p><div id="def08540-1678-4895-ab3c-b6f01b131d75" class="column-list"><div id="435c2eeb-9b96-4dfa-a6dc-34090c846fa5" style="width:50%" class="column"><figure id="c32db869-4f8a-4b03-bc4b-880ef9bc21b1" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.58.45_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.58.45_PM.png"/></a><figcaption>ambient only</figcaption></figure></div><div id="a0382fd9-39d4-4dc5-8480-2df5c969fd80" style="width:50%" class="column"><figure id="e1264129-bb88-4464-874d-b5d0403c45c4" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.59.03_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.59.03_PM.png"/></a><figcaption>diffuse only</figcaption></figure></div></div><p id="5a4d9523-6891-4a27-a9f8-00d2ff977011" class="">The diffuse component represents the light that is scattered uniformly in all directions by the surface. It depends on the angle between the surface normal and the direction of the light source, as well as the value of the light source and the colour of the surface. It makes up the majority of the lighting in the model. Finally, the specular component represents the light that is reflected in a specific direction by the surface. It contributes to the ‘shiny’ nature of the material.</p><div id="87f1cfb1-9bd8-44bc-b9a2-16bd7af904e2" class="column-list"><div id="d4fd9467-1c20-4490-8551-a10dd349270a" style="width:50%" class="column"><figure id="199cfdee-6687-45a9-b512-734d2581f384" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.59.23_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.59.23_PM.png"/></a><figcaption>specular only</figcaption></figure></div><div id="c4efe86d-b38c-4949-bc89-09da9e18d45e" style="width:50%" class="column"><figure id="002a2188-0671-4891-a115-aeb62b6e3cbb" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.58.12_PM.png"><img style="width:1092px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_7.58.12_PM.png"/></a><figcaption>entire Blinn-Phong model</figcaption></figure></div></div><ul id="dde68e05-fd4b-4766-b8b6-a56ec38b32f2" class="bulleted-list"><li style="list-style-type:disc">Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</li></ul><p id="1c3c6914-84d0-41be-b849-a1acf29efa70" class="">I also implemented texture mapping, which draws from a custom texture file to colour the 3D objects. Here, I used the writeup instructions for this section as the texture.</p><figure id="fc486768-eba8-4254-a046-3e2a22c4ce3c" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.04.39_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.04.39_PM.png"/></a><figcaption>texture shader on the cloth draped over the ball</figcaption></figure><p id="d8ced59f-d615-4ef6-8093-675aceb477ef" class="">I also implemented bump mapping and texture mapping. I used the provided <code>texture_3.png</code> as my map. Bump mapping works by perturbing the surface normals of an object by using a texture map that encodes the height or depth of the bumps. Displacement mapping works similarly, but instead of perturbing the surface normals, it physically deforms the surface of the object. </p><ul id="01f13154-d366-4a6e-9d71-18b395218de9" class="bulleted-list"><li style="list-style-type:disc">Show a screenshot of bump mapping on the cloth and on the sphere. Show a screenshot of displacement mapping on the sphere. Use the same texture for both renders. You can either provide your own texture or use one of the ones in the textures directory, BUT choose one that&#x27;s not the default <code>texture_2.png</code>. Compare the two approaches and resulting renders in your own words. Compare how your the two shaders react to the sphere by changing the sphere mesh&#x27;s coarseness by using <code>o 16 -a 16</code> and then <code>o 128 -a 128</code>.</li></ul><div id="e4e92a4c-a3da-4c16-9d4e-9de47038cea8" class="column-list"><div id="97b82978-00fe-4771-9ac0-8d4c2c402561" style="width:50%" class="column"><figure id="43b5f3af-42df-4ab1-a416-6681cd5b03ad" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.12.04_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.12.04_PM.png"/></a><figcaption>bump mapping</figcaption></figure></div><div id="7dc0ad5d-fba2-4aa1-b806-9d5dc2abf355" style="width:50%" class="column"><figure id="7a5075fa-fe82-4c39-b9e5-f2f75ac42633" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.19.43_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.19.43_PM.png"/></a><figcaption>displacement mapping</figcaption></figure></div></div><p id="12aa951b-b0a9-407a-8eb2-6998f03ea625" class="">Using similar settings, we can see that while bump mapping, which only utilizes a fragment shader creates an effect of texture, the effect is much more visible in the displacement mapping image. It really looks like the cloth and sphere is make out of bricks. </p><p id="03234904-1a3d-4cab-8ee4-6049f082c43c" class="">Changing the coarseness of the mesh can affect the quality and accuracy of both bump mapping and displacement mapping. A coarse mesh has fewer vertices and thus there are fewer vertices to displace. We can see that on the ball, the more finely rendered ball has better displacement at the same settings. However, the result is not very pronounced. on the bump shading image, while a higher resolution sphere render gives more clarity, it is not affected nearly as much as displacement mapping.</p><div id="5d5e9d2e-2bbf-47bb-8766-f5fc55db5b07" class="column-list"><div id="94c9ddf2-bce5-44db-a006-b995cea1bae3" style="width:50%" class="column"><figure id="489ca807-36a2-4661-87a7-d268c3b8891d" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.13.59_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.13.59_PM.png"/></a><figcaption>bump mapping (-o 16 -a 16)</figcaption></figure><figure id="5df7ecf8-d744-4ca0-96d3-56f92ed7ab21" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.14.48_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.14.48_PM.png"/></a><figcaption>bump mapping (-o 128 -a 128)</figcaption></figure></div><div id="4136ae8f-1dce-45d9-a93f-c66075cbafe1" style="width:50%" class="column"><figure id="706448fc-f0a1-43d6-bb0d-fcda127aa94b" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.14.25_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.14.25_PM.png"/></a><figcaption>displacement mapping (-o 16 -a 16)</figcaption></figure><figure id="78b3c387-090d-4212-b85a-fa90313501e9" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.15.01_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.15.01_PM.png"/></a><figcaption>displacement mapping (-o 128 -a 128)</figcaption></figure></div></div><p id="b51e59b1-9966-43a8-bb26-15eae1c4b40b" class="">I finally implemented a mirror shader, which uses a environment map to generate the reflections.</p><div id="6fdc1f57-7424-4e79-a3cd-20652daa8432" class="column-list"><div id="b9c35302-1a26-4d79-9cfc-19aeb369be16" style="width:50%" class="column"><figure id="696b9e99-e083-4df9-bd36-ce3911b85628" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.15.40_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.15.40_PM.png"/></a><figcaption>mirror sphere</figcaption></figure></div><div id="402de279-8c00-4cc8-8a38-fd87ad5a3906" style="width:50%" class="column"><figure id="72cb87e5-ec94-4a7f-ac4e-1acec787e99d" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.16.45_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.16.45_PM.png"/></a><figcaption>top view of mirror cloth</figcaption></figure></div></div><h2 id="66be30a3-7157-4476-8c9d-206c7a13cf8a" class="">Extra Credit</h2><p id="60bea534-9fde-4ba6-8b92-56f534757df8" class="">For extra credit, I implemented my own shader using principles from all of the above shaders to create a semi-realistic water shader. The shader is a combination of several techniques, including Blinn-Phong shading, bump mapping, reflection, refraction, mirror shading, and texture mapping. I calculate diffuse and specular lighting components similar to Blinn-Phong. This shader uses multiple textures to achieved the desired water appearance. I sample a normal map, which is used to add details. I simulate reflection and refraction using an environment map to sample the surrounding environment, similar to the mirror. I use the Fresnel effect to blend the reflection and refraction contributions.</p><div id="26e6834b-8dbd-49b4-ae03-d626fd1d6798" class="column-list"><div id="1ead8d97-5c55-439b-b3d1-adc677ff0ec6" style="width:50%" class="column"><figure id="394b94a6-bbeb-4419-8e0d-7277040e2e93" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.57.44_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.57.44_PM.png"/></a></figure></div><div id="62c69f29-d5b7-4a26-9956-296f10867796" style="width:50%" class="column"><figure id="6c49417f-39bf-4339-ad60-ba8e2ac93c34" class="image"><a href="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.57.34_PM.png"><img style="width:1136px" src="CS%20184%20Project%204%20Clothsim%20f8ccf3de53f64eb4b5b5295024912818/Screenshot_2023-04-16_at_8.57.34_PM.png"/></a></figure></div></div></div></article></body></html>
